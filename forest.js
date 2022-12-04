@@ -239,7 +239,7 @@ function main() {
   ];
   let id;
   // 创建曲线
-  curve = new THREE.CatmullRomCurve3(points, true, "catmullrom", 0.1);
+  const curve = new THREE.CatmullRomCurve3(points, true, "catmullrom", 0.1);
   let time = 0;
   function moveCamera() {
     // 把曲线分割成2999段， 可以得到3000个点
