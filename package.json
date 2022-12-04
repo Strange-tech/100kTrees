@@ -1,0 +1,18 @@
+{
+  "name": "forest",
+  "version": "1.0.0",
+  "description": "",
+  "default": "index.html",
+  "scripts": {
+    "dev": "parcel index.html",
+    "build": "parcel build index.html --dist-dir ./dist"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "three": "^0.147.0"
+  },
+  "devDependencies": {
+    "parcel": "^2.8.0"
+  }
+}
