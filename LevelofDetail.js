@@ -2,7 +2,7 @@ import * as THREE from "three";
 
 /*************************************************************************************
  * CLASS NAME:  LevelofDetail
- * DESCRIPTION: Combine instancedMesh into lod instead of using THREE.LOD
+ * DESCRIPTION: Combine instancedMesh with lod instead of using THREE.LOD
  * NOTE:        Each class of LevelofDetail represents one single kind of tree,
  *              check 'treeSpecies' for detail
  *

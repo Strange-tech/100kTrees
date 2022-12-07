@@ -3,7 +3,7 @@
 import * as THREE from "three";
 import { LevelofDetail } from "./LevelofDetail.js";
 import { Terrain } from "./Terrain.js";
-// import { Wander } from "./Wander.js";
+import { GUIController } from "./GUIController.js";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { GUI } from "three/examples/jsm/libs/lil-gui.module.min.js";
@@ -34,6 +34,8 @@ function main() {
   controls.target.set(0, 5, 0);
   // controls.autoRotate = true;
   controls.update();
+
+  const guiController = new GUIController(scene);
 
   /////////////////////////////////////////////////////////////////////////////////
   // SKY BOX
@@ -106,10 +108,6 @@ function main() {
       position.y = array[idx + 1];
       position.z = array[idx + 2];
 
-      // rotation.x = Math.random() * 2 * Math.PI;
-      // rotation.y = Math.random() * 2 * Math.PI;
-      // rotation.z = Math.random() * 2 * Math.PI;
-
       quaternion.setFromEuler(rotation);
 
       matrix.compose(position, quaternion, scale);
@@ -119,27 +117,43 @@ function main() {
     return matrixArray;
   };
 
-  const matrixArray = randomMatrix(vertices, totalNum);
+  const forestDistribute = function (forest, matrixArray) {
+    const forestMatrix = {};
+    let startIndex = 0;
+    forest.forEach((tree) => {
+      forestMatrix[tree.species] = matrixArray.slice(
+        startIndex,
+        startIndex + tree.num
+      );
+      startIndex += tree.num;
+    });
+    return forestMatrix;
+  };
 
-  const pos_Macrophanerophytes = new THREE.Vector3(
-      matrixArray[0].elements[12],
-      matrixArray[0].elements[13],
-      matrixArray[0].elements[14]
+  const matrixArray = randomMatrix(vertices, totalNum);
+  const forestMatrix = forestDistribute(forest, matrixArray);
+
+  // 随便选三种树的坐标
+  const watchPos = {
+    Macrophanerophytes: new THREE.Vector3(
+      forestMatrix["Macrophanerophytes"][0].elements[12],
+      forestMatrix["Macrophanerophytes"][0].elements[13],
+      forestMatrix["Macrophanerophytes"][0].elements[14]
     ),
-    pos_Broadleaf = new THREE.Vector3(
-      matrixArray[40001].elements[12],
-      matrixArray[40001].elements[13],
-      matrixArray[40001].elements[14]
+    Broadleaf: new THREE.Vector3(
+      forestMatrix["Broadleaf"][0].elements[12],
+      forestMatrix["Broadleaf"][0].elements[13],
+      forestMatrix["Broadleaf"][0].elements[14]
     ),
-    pos_Bamboo = new THREE.Vector3(
-      matrixArray[99999].elements[12],
-      matrixArray[99999].elements[13],
-      matrixArray[99999].elements[14]
-    );
+    Bamboo: new THREE.Vector3(
+      forestMatrix["Bamboo"][0].elements[12],
+      forestMatrix["Bamboo"][0].elements[13],
+      forestMatrix["Bamboo"][0].elements[14]
+    ),
+  };
 
   const loadTree = function (treeObjectArray) {
     const loader = new GLTFLoader();
-    let startIndex = 0;
 
     treeObjectArray.forEach((obj) => {
       const { url, species, num } = obj;
@@ -165,29 +179,9 @@ function main() {
             lod.setLevels(array);
             lod.setPopulation(num);
             for (let i = 0; i < num; i++) {
-              let matrix = matrixArray[startIndex + i];
+              let matrix = forestMatrix[species][i];
               lod.setTransform(i, matrix);
-              if (species === "Macrophanerophytes" && !pos_Macrophanerophytes) {
-                pos_Macrophanerophytes = new THREE.Vector3(
-                  matrix.elements[12],
-                  matrix.elements[13],
-                  matrix.elements[14]
-                );
-              } else if (species === "Broadleaf" && !pos_Broadleaf) {
-                pos_Broadleaf = new THREE.Vector3(
-                  matrix.elements[12],
-                  matrix.elements[13],
-                  matrix.elements[14]
-                );
-              } else if (species === "Bamboo" && !pos_Bamboo) {
-                pos_Bamboo = new THREE.Vector3(
-                  matrix.elements[12],
-                  matrix.elements[13],
-                  matrix.elements[14]
-                );
-              }
             }
-            startIndex += num;
             render();
           });
         });
@@ -200,71 +194,33 @@ function main() {
 
   /////////////////////////////////////////////////////////////////////////////////
   // WATCH
-  const watchTree = function (treeSpecies) {
-    let pos;
-    switch (treeSpecies) {
-      case "Macrophanerophytes":
-        pos = pos_Macrophanerophytes;
-        break;
-      case "Broadleaf":
-        pos = pos_Broadleaf;
-        break;
-      case "Bamboo":
-        pos = pos_Bamboo;
-        break;
-      default:
-        break;
-    }
-    camera.position.set(pos.x + 70, pos.y + 70, pos.z + 70);
-    camera.lookAt(pos);
-
-    renderForWatch();
-  };
-
-  function renderForWatch() {
+  function renderForWatch(treeSpecies) {
+    guiController.setWatch(treeSpecies, watchPos);
+    const watchCamera = guiController.getWatchCamera();
     lods.forEach((lod) => {
-      lod.update(camera);
+      lod.update(watchCamera);
     });
-    renderer.render(scene, camera);
+    renderer.render(scene, watchCamera);
   }
 
   /////////////////////////////////////////////////////////////////////////////////
   // WANDER
-  // 点的坐标数据
   const points = [
     new THREE.Vector3(8000, 200, 8000),
     new THREE.Vector3(8000, 200, -8000),
     new THREE.Vector3(-8000, 200, -8000),
     new THREE.Vector3(-8000, 200, 8000),
   ];
-  let id;
-  // 创建曲线
-  const curve = new THREE.CatmullRomCurve3(points, true, "catmullrom", 0.1);
-  let time = 0;
-  function moveCamera() {
-    // 把曲线分割成2999段， 可以得到3000个点
-    let points = curve.getPoints(3000);
-    // 更新取点索引
-    time += 3;
-    // 相机所在点索引
-    const index1 = time % 3000;
-    // 前方机器人所在位置点的索引
-    const index2 = (time + 50) % 3000;
-    // 根据索引取点
-    let point = points[index1];
-    let point1 = points[index2];
-    // 修改相机和模型位置
-    if (point && point.x) {
-      camera.position.set(point.x, point.y, point.z);
-      camera.lookAt(point1.x, point1.y, point1.z);
-    }
-  }
+  const endTime = 3000;
+
+  guiController.setWander(points, endTime);
+  const wanderCamera = guiController.getWanderCamera();
 
   function renderForWander() {
-    moveCamera();
-    id = requestAnimationFrame(renderForWander);
-    if (time === 3000) cancelAnimationFrame(id);
-    renderer.render(scene, camera);
+    guiController.moveCamera();
+    let id = requestAnimationFrame(renderForWander);
+    if (guiController.reachWanderEnd()) cancelAnimationFrame(id);
+    renderer.render(scene, wanderCamera);
   }
 
   /////////////////////////////////////////////////////////////////////////////////
@@ -274,13 +230,13 @@ function main() {
       renderForWander();
     },
     watchTree1: function () {
-      watchTree("Macrophanerophytes");
+      renderForWatch("Macrophanerophytes");
     },
     watchTree2: function () {
-      watchTree("Broadleaf");
+      renderForWatch("Broadleaf");
     },
     watchTree3: function () {
-      watchTree("Bamboo");
+      renderForWatch("Bamboo");
     },
   };
   const gui = new GUI();
