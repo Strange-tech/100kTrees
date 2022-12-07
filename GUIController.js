@@ -1,8 +1,13 @@
 import * as THREE from "three";
 
+/*************************************************************************************
+ * CLASS NAME:  GUIController
+ * DESCRIPTION: use multiple cameras to watch different scenes
+ * NOTE:
+ *
+ *************************************************************************************/
 class GUIController {
-  constructor(scene) {
-    this.scene = scene;
+  constructor() {
     this.cameras = {}; // set many camera stands
     this.curve = undefined;
     this.endTime = 0;

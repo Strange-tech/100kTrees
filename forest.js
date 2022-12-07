@@ -35,7 +35,7 @@ function main() {
   // controls.autoRotate = true;
   controls.update();
 
-  const guiController = new GUIController(scene);
+  const guiController = new GUIController();
 
   /////////////////////////////////////////////////////////////////////////////////
   // SKY BOX
