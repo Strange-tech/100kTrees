@@ -11,8 +11,8 @@ class LevelofDetail {
   constructor(scene, camera, treeSpecies) {
     this.treeSpecies = treeSpecies;
     this.numOfLevel = 0;
-    this.scene = scene; // THREE.Scene
-    this.camera = camera; // THREE.Camera
+    this.scene = scene;
+    this.camera = camera;
     this.levels = undefined;
     this.instancedMeshOfAllLevel = undefined;
     this.groupOfInstances = undefined;
@@ -59,7 +59,8 @@ class LevelofDetail {
 
   setTransform(index, matrix4) {
     const { transformation, treeSpecies } = this;
-    let scale;
+    let scale = 1;
+    const k = 0.02; // 有些glb模型本身太大，乘以缩小系数
     switch (treeSpecies) {
       case "Macrophanerophytes":
         scale = Math.random() * 0.5 + 1.5; // (1.5, 2)
@@ -69,6 +70,15 @@ class LevelofDetail {
         break;
       case "Bamboo":
         scale = Math.random() * 0.3 + 0.5; // (0.5, 0.8)
+        break;
+      case "bullshit":
+        scale = k * (Math.random() * 2 + 2); // (2, 4)
+        break;
+      case "fuckyou":
+        scale = k * (Math.random() * 1 + 1); // (1, 2)
+        break;
+      case "idiot":
+        scale = k * (Math.random() * 1 + 1); // (1, 2)
         break;
       default:
         break;
@@ -134,6 +144,8 @@ class LevelofDetail {
           obj.meshes[j].material,
           obj.count
         );
+        // instancedMesh.castShadow = true;
+        // instancedMesh.receiveShadow = true;
         for (let k = 0; k < obj.count; k++) {
           instancedMesh.setMatrixAt(k, obj.matrix4[k]);
         }

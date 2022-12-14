@@ -1,5 +1,6 @@
 import * as THREE from "three";
 import { ImprovedNoise } from "three/examples/jsm/math/ImprovedNoise.js";
+// import { ImprovedNoise } from "three/addons/math/ImprovedNoise.js";
 
 /*************************************************************************************
  * CLASS NAME:  Terrain
@@ -33,6 +34,7 @@ class Terrain {
     };
 
     this.mesh = new THREE.Mesh(this.planeGeometry, this.planeMaterial);
+    // this.mesh.receiveShadow = true;
   }
 
   setImprovedNoise(quality) {

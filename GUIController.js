@@ -49,20 +49,8 @@ class GUIController {
     const watchCamera = new THREE.PerspectiveCamera(45, 2, 0.1, 50000);
     this.cameras.watchCamera = watchCamera;
 
-    let pos;
-    switch (treeSpecies) {
-      case "Macrophanerophytes":
-        pos = watchPos.Macrophanerophytes;
-        break;
-      case "Broadleaf":
-        pos = watchPos.Broadleaf;
-        break;
-      case "Bamboo":
-        pos = watchPos.Bamboo;
-        break;
-      default:
-        break;
-    }
+    const pos = watchPos[treeSpecies];
+
     watchCamera.position.set(pos.x + 70, pos.y + 70, pos.z + 70);
     watchCamera.lookAt(pos);
   }

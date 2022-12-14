@@ -4,8 +4,8 @@
   "description": "",
   "default": "index.html",
   "scripts": {
-    "dev": "parcel index.html",
-    "build": "parcel build index.html --dist-dir ./dist && cp -R ./resources ./dist/resources"
+    "dev": "parcel index.html --port 2000",
+    "build": "parcel build index.html --dist-dir ./dist && cp -r ./resources ./dist/"
   },
   "author": "",
   "license": "ISC",

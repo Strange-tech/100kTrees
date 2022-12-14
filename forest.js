@@ -8,11 +8,16 @@ import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { GUI } from "three/examples/jsm/libs/lil-gui.module.min.js";
 
+// import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+// import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
+// import { GUI } from "three/addons/libs/lil-gui.module.min.js";
+
 function main() {
   // global variables
   const canvas = document.querySelector("#c");
   const renderer = new THREE.WebGLRenderer({ canvas });
   renderer.setClearColor(0x87cefa, 1);
+  // renderer.shadowMap.enabled = true;
 
   const scene = new THREE.Scene();
 
@@ -24,11 +29,12 @@ function main() {
   camera.position.set(-455, 148, -464);
   camera.lookAt(0, 0, 0);
 
-  const color = 0xffffff;
-  const intensity = 1.5;
-  const light = new THREE.AmbientLight(color, intensity);
-  light.position.set(0, 100, 0);
-  scene.add(light);
+  {
+    const color = 0xffffff;
+    const intensity = 1.5;
+    const light = new THREE.AmbientLight(color, intensity);
+    scene.add(light);
+  }
 
   const controls = new OrbitControls(camera, canvas);
   controls.target.set(0, 5, 0);
@@ -78,12 +84,20 @@ function main() {
     {
       url: "resources/models/trees/tree1",
       species: "Macrophanerophytes",
-      num: 30000,
+      num: 20000,
     },
-    { url: "resources/models/trees/tree2", species: "Broadleaf", num: 30000 },
-    { url: "resources/models/trees/tree3", species: "Bamboo", num: 40000 },
+    { url: "resources/models/trees/tree2", species: "Broadleaf", num: 20000 },
+    { url: "resources/models/trees/tree3", species: "Bamboo", num: 20000 },
+    {
+      url: "resources/models/trees/tree4",
+      species: "bullshit",
+      num: 20000,
+    },
+    { url: "resources/models/trees/tree7", species: "fuckyou", num: 20000 },
+    { url: "resources/models/trees/tree8", species: "idiot", num: 20000 },
   ];
-  const totalNum = 100000; // 十万级别的森林
+
+  const totalNum = 120000; // 十万级别的森林
 
   const randomMatrix = function (vertices, num) {
     const position = new THREE.Vector3();
@@ -107,6 +121,8 @@ function main() {
       position.x = array[idx];
       position.y = array[idx + 1];
       position.z = array[idx + 2];
+
+      // rotation.y = Math.random() * 2 * Math.PI;
 
       quaternion.setFromEuler(rotation);
 
@@ -133,26 +149,17 @@ function main() {
   const matrixArray = randomMatrix(vertices, totalNum);
   const forestMatrix = forestDistribute(forest, matrixArray);
 
-  // 随便选三种树的坐标
-  const watchPos = {
-    Macrophanerophytes: new THREE.Vector3(
-      forestMatrix["Macrophanerophytes"][0].elements[12],
-      forestMatrix["Macrophanerophytes"][0].elements[13],
-      forestMatrix["Macrophanerophytes"][0].elements[14]
-    ),
-    Broadleaf: new THREE.Vector3(
-      forestMatrix["Broadleaf"][0].elements[12],
-      forestMatrix["Broadleaf"][0].elements[13],
-      forestMatrix["Broadleaf"][0].elements[14]
-    ),
-    Bamboo: new THREE.Vector3(
-      forestMatrix["Bamboo"][0].elements[12],
-      forestMatrix["Bamboo"][0].elements[13],
-      forestMatrix["Bamboo"][0].elements[14]
-    ),
-  };
+  const watchPos = {};
+  forest.forEach((tree) => {
+    let sp = tree.species;
+    watchPos[sp] = new THREE.Vector3(
+      forestMatrix[sp][0].elements[12],
+      forestMatrix[sp][0].elements[13],
+      forestMatrix[sp][0].elements[14]
+    );
+  });
 
-  const loadTree = function (treeObjectArray) {
+  const loadTreeWithLOD = function (treeObjectArray) {
     const loader = new GLTFLoader();
 
     treeObjectArray.forEach((obj) => {
@@ -161,17 +168,17 @@ function main() {
       lods.push(lod);
 
       const array = [];
-      loader.load(`${url}/2.glb`, (gltf) => {
+      loader.load(`${url}/high.glb`, (gltf) => {
         array.push({
           distance: 500,
           group: gltf.scene.children,
         });
-        loader.load(`${url}/1.glb`, (gltf) => {
+        loader.load(`${url}/middle.glb`, (gltf) => {
           array.push({
-            distance: 2000,
+            distance: 1000,
             group: gltf.scene.children,
           });
-          loader.load(`${url}/0.glb`, (gltf) => {
+          loader.load(`${url}/low.glb`, (gltf) => {
             array.push({
               distance: 3000,
               group: gltf.scene.children,
@@ -189,8 +196,43 @@ function main() {
       // end of load
     });
   };
+  loadTreeWithLOD(forest.slice(0, 3));
 
-  loadTree(forest);
+  const loadTree = function (treeObjectArray) {
+    const loader = new GLTFLoader();
+
+    treeObjectArray.forEach((obj) => {
+      const { url, species, num } = obj;
+      // console.log(obj);
+      const lod = new LevelofDetail(scene, camera, species);
+      lods.push(lod);
+
+      const array = [];
+      loader.load(`${url}/high.glb`, (gltf) => {
+        array.push({
+          distance: 700,
+          group: gltf.scene.children[0].children,
+        });
+        // console.log(gltf.scene);
+        loader.load(`${url}/low.glb`, (gltf) => {
+          array.push({
+            distance: 2000,
+            group: gltf.scene.children,
+          });
+          // console.log(gltf.scene);
+          lod.setLevels(array);
+          lod.setPopulation(num);
+          for (let i = 0; i < num; i++) {
+            let matrix = forestMatrix[species][i];
+            lod.setTransform(i, matrix);
+          }
+          render();
+        });
+      });
+      // end of load
+    });
+  };
+  loadTree(forest.slice(3, 6));
 
   /////////////////////////////////////////////////////////////////////////////////
   // WATCH
@@ -238,12 +280,24 @@ function main() {
     watchTree3: function () {
       renderForWatch("Bamboo");
     },
+    watchTree4: function () {
+      renderForWatch("bullshit");
+    },
+    watchTree5: function () {
+      renderForWatch("fuckyou");
+    },
+    watchTree6: function () {
+      renderForWatch("idiot");
+    },
   };
   const gui = new GUI();
   gui.add(obj, "wander");
   gui.add(obj, "watchTree1");
   gui.add(obj, "watchTree2");
   gui.add(obj, "watchTree3");
+  gui.add(obj, "watchTree4");
+  gui.add(obj, "watchTree5");
+  gui.add(obj, "watchTree6");
 
   /////////////////////////////////////////////////////////////////////////////////
   // RENDER
