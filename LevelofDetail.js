@@ -59,8 +59,8 @@ class LevelofDetail {
 
   setTransform(index, matrix4) {
     const { transformation, treeSpecies } = this;
-    let scale = 1;
     const k = 0.02; // 有些glb模型本身太大，乘以缩小系数
+    let scale = k;
     switch (treeSpecies) {
       case "Macrophanerophytes":
         scale = Math.random() * 0.5 + 1.5; // (1.5, 2)
@@ -72,12 +72,21 @@ class LevelofDetail {
         scale = Math.random() * 0.3 + 0.5; // (0.5, 0.8)
         break;
       case "bullshit":
-        scale = k * (Math.random() * 2 + 2); // (2, 4)
+        scale = k * (Math.random() * 1 + 1.5); // (1.5, 2.5)
         break;
       case "fuckyou":
         scale = k * (Math.random() * 1 + 1); // (1, 2)
         break;
       case "idiot":
+        scale = k * (Math.random() * 1 + 1); // (1, 2)
+        break;
+      case "nerd":
+        scale = k * (Math.random() * 5 + 10); // (10, 15)
+        break;
+      case "coward":
+        scale = k * (Math.random() * 1 + 1); // (1, 2)
+        break;
+      case "fool":
         scale = k * (Math.random() * 1 + 1); // (1, 2)
         break;
       default:

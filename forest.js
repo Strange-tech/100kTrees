@@ -39,9 +39,8 @@ function main() {
   const controls = new OrbitControls(camera, canvas);
   controls.target.set(0, 5, 0);
   // controls.autoRotate = true;
-  controls.update();
 
-  const guiController = new GUIController();
+  const guiController = new GUIController(camera, controls);
 
   /////////////////////////////////////////////////////////////////////////////////
   // SKY BOX
@@ -84,20 +83,23 @@ function main() {
     {
       url: "resources/models/trees/tree1",
       species: "Macrophanerophytes",
-      num: 20000,
+      num: 10000,
     },
-    { url: "resources/models/trees/tree2", species: "Broadleaf", num: 20000 },
-    { url: "resources/models/trees/tree3", species: "Bamboo", num: 20000 },
+    { url: "resources/models/trees/tree2", species: "Broadleaf", num: 10000 },
+    { url: "resources/models/trees/tree3", species: "Bamboo", num: 10000 },
     {
       url: "resources/models/trees/tree4",
       species: "bullshit",
-      num: 20000,
+      num: 10000,
     },
-    { url: "resources/models/trees/tree7", species: "fuckyou", num: 20000 },
-    { url: "resources/models/trees/tree8", species: "idiot", num: 20000 },
+    { url: "resources/models/trees/tree7", species: "fuck", num: 10000 },
+    { url: "resources/models/trees/tree8", species: "idiot", num: 10000 },
+    { url: "resources/models/trees/tree9", species: "nerd", num: 1 },
+    { url: "resources/models/trees/tree10", species: "coward", num: 10000 },
+    { url: "resources/models/trees/tree11", species: "fool", num: 10000 },
   ];
 
-  const totalNum = 120000; // 十万级别的森林
+  const totalNum = 80001; // 十万级别的森林
 
   const randomMatrix = function (vertices, num) {
     const position = new THREE.Vector3();
@@ -210,16 +212,15 @@ function main() {
       const array = [];
       loader.load(`${url}/high.glb`, (gltf) => {
         array.push({
-          distance: 700,
+          distance: 1000,
           group: gltf.scene.children[0].children,
         });
-        // console.log(gltf.scene);
         loader.load(`${url}/low.glb`, (gltf) => {
+          console.log(gltf.scene);
           array.push({
             distance: 2000,
             group: gltf.scene.children,
           });
-          // console.log(gltf.scene);
           lod.setLevels(array);
           lod.setPopulation(num);
           for (let i = 0; i < num; i++) {
@@ -232,17 +233,16 @@ function main() {
       // end of load
     });
   };
-  loadTree(forest.slice(3, 6));
+  loadTree(forest.slice(3, 9));
 
   /////////////////////////////////////////////////////////////////////////////////
   // WATCH
   function renderForWatch(treeSpecies) {
     guiController.setWatch(treeSpecies, watchPos);
-    const watchCamera = guiController.getWatchCamera();
     lods.forEach((lod) => {
-      lod.update(watchCamera);
+      lod.update(camera);
     });
-    renderer.render(scene, watchCamera);
+    renderer.render(scene, camera);
   }
 
   /////////////////////////////////////////////////////////////////////////////////
@@ -256,18 +256,23 @@ function main() {
   const endTime = 3000;
 
   guiController.setWander(points, endTime);
-  const wanderCamera = guiController.getWanderCamera();
 
   function renderForWander() {
     guiController.moveCamera();
     let id = requestAnimationFrame(renderForWander);
     if (guiController.reachWanderEnd()) cancelAnimationFrame(id);
-    renderer.render(scene, wanderCamera);
+    renderer.render(scene, camera);
   }
 
   /////////////////////////////////////////////////////////////////////////////////
   // GUI
   const obj = {
+    reset: function () {
+      camera.position.set(-455, 148, -464);
+      camera.lookAt(0, 0, 0);
+      controls.target.set(0, 0, 0);
+      renderer.render(scene, camera);
+    },
     wander: function () {
       renderForWander();
     },
@@ -284,13 +289,17 @@ function main() {
       renderForWatch("bullshit");
     },
     watchTree5: function () {
-      renderForWatch("fuckyou");
+      renderForWatch("fuck");
     },
     watchTree6: function () {
       renderForWatch("idiot");
     },
+    watchTree7: function () {
+      renderForWatch("nerd");
+    },
   };
   const gui = new GUI();
+  gui.add(obj, "reset");
   gui.add(obj, "wander");
   gui.add(obj, "watchTree1");
   gui.add(obj, "watchTree2");
@@ -298,6 +307,7 @@ function main() {
   gui.add(obj, "watchTree4");
   gui.add(obj, "watchTree5");
   gui.add(obj, "watchTree6");
+  gui.add(obj, "watchTree7");
 
   /////////////////////////////////////////////////////////////////////////////////
   // RENDER
@@ -325,7 +335,7 @@ function main() {
       lod.update(camera);
     });
 
-    controls.update();
+    // controls.update();
     renderer.render(scene, camera);
   }
 

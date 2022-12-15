@@ -1,4 +1,6 @@
 import * as THREE from "three";
+import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
+// import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 
 /*************************************************************************************
  * CLASS NAME:  GUIController
@@ -7,22 +9,17 @@ import * as THREE from "three";
  *
  *************************************************************************************/
 class GUIController {
-  constructor() {
-    this.cameras = {}; // set many camera stands
+  constructor(camera, controls) {
+    this.camera = camera;
     this.curve = undefined;
     this.endTime = 0;
     this.time = 0; // timer
+    this.controls = controls;
   }
 
   setWander(points, endTime) {
-    const wanderCamera = new THREE.PerspectiveCamera(45, 2, 0.1, 5000);
-    this.cameras.wanderCamera = wanderCamera;
     this.curve = new THREE.CatmullRomCurve3(points, true, "catmullrom", 0.1);
     this.endTime = endTime;
-  }
-
-  getWanderCamera() {
-    return this.cameras.wanderCamera;
   }
 
   reachWanderEnd() {
@@ -31,8 +28,7 @@ class GUIController {
   }
 
   moveCamera() {
-    const { cameras, curve } = this;
-    const wanderCamera = cameras.wanderCamera;
+    const { camera, curve } = this;
     let points = curve.getPoints(3000);
     this.time += 3;
     const index1 = this.time % 3000;
@@ -40,23 +36,20 @@ class GUIController {
     let point = points[index1];
     let point1 = points[index2];
     if (point && point.x) {
-      wanderCamera.position.set(point.x, point.y, point.z);
-      wanderCamera.lookAt(point1.x, point1.y, point1.z);
+      camera.position.set(point.x, point.y, point.z);
+      camera.lookAt(point1.x, point1.y, point1.z);
     }
   }
 
   setWatch(treeSpecies, watchPos) {
-    const watchCamera = new THREE.PerspectiveCamera(45, 2, 0.1, 50000);
-    this.cameras.watchCamera = watchCamera;
-
+    const { camera, controls } = this;
     const pos = watchPos[treeSpecies];
 
-    watchCamera.position.set(pos.x + 70, pos.y + 70, pos.z + 70);
-    watchCamera.lookAt(pos);
-  }
-
-  getWatchCamera() {
-    return this.cameras.watchCamera;
+    camera.position.set(pos.x + 70, pos.y + 70, pos.z + 70);
+    camera.lookAt(pos);
+    controls.target.set(pos.x, pos.y, pos.z);
+    // controls.update();
+    console.log(camera);
   }
 }
 
