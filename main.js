@@ -16,6 +16,9 @@ import { GUI } from "three/examples/jsm/libs/lil-gui.module.min.js";
 function main() {
   // global variables
   const canvas = document.querySelector("#c");
+  const bar = document.querySelector("#bar");
+  const container = document.querySelector(".container");
+
   const renderer = new THREE.WebGLRenderer({ canvas });
   renderer.setClearColor(0x87cefa, 1);
   // renderer.shadowMap.enabled = true;
@@ -200,71 +203,62 @@ function main() {
     );
   });
 
-  const loadModel = async function (forest) {
+  let loadCount = 0;
+  const promiseController = function (url, species, level, distance) {
     const loader = new GLTFLoader();
+
+    return new Promise((resolve) => {
+      loader.load(url, (gltf) => {
+        resolve({
+          // 以下代码是为了妥协傻逼模型
+          group: gltf.scene.children[0].isMesh
+            ? gltf.scene.children
+            : gltf.scene.children[0].children,
+          species: species,
+          level: level,
+          distance: distance,
+        });
+      });
+    }).then((res) => {
+      loadCount++;
+      bar.style.width = bar.innerHTML =
+        Math.floor((100 * loadCount) / 21) + "%";
+      // console.log(loadCount);
+      if (loadCount === 21) {
+        container.style.display = "none";
+        canvas.style.opacity = 1;
+        render();
+      }
+      return res;
+    });
+  };
+
+  const loadModel = async function (forest) {
     const array = [];
     forest.content.forEach((obj, index) => {
       const { url, species } = obj;
       let high, middle, low;
-      // 以下代码是为了妥协傻逼模型
+
       if (index < 3) {
-        high = new Promise((resolve) => {
-          loader.load(`${url}/high.glb`, (gltf) => {
-            resolve({
-              group: gltf.scene.children,
-              species: species,
-              level: "high",
-              distance: 500,
-            });
-          });
-        });
-        low = new Promise((resolve) => {
-          loader.load(`${url}/low.glb`, (gltf) => {
-            resolve({
-              group: gltf.scene.children,
-              species: species,
-              level: "low",
-              distance: 3000,
-            });
-          });
-        });
-        middle = new Promise((resolve) => {
-          loader.load(`${url}/middle.glb`, (gltf) => {
-            resolve({
-              group: gltf.scene.children,
-              species: species,
-              level: "middle",
-              distance: 1000,
-            });
-          });
-        });
+        high = promiseController(`${url}/high.glb`, species, "high", 500);
+        low = promiseController(`${url}/low.glb`, species, "low", 3000);
+        middle = promiseController(
+          `${url}/middle.glb`,
+          species,
+          "middle",
+          1000
+        );
         array.push(high, middle, low);
       } else {
-        high = new Promise((resolve) => {
-          loader.load(`${url}/high.glb`, (gltf) => {
-            resolve({
-              group: gltf.scene.children[0].children,
-              species: species,
-              level: "high",
-              distance: 1000,
-            });
-          });
-        });
-        low = new Promise((resolve) => {
-          loader.load(`${url}/low.glb`, (gltf) => {
-            resolve({
-              group: gltf.scene.children,
-              species: species,
-              level: "low",
-              distance: 2000,
-            });
-          });
-        });
+        high = promiseController(`${url}/high.glb`, species, "high", 1000);
+        low = promiseController(`${url}/low.glb`, species, "low", 2000);
         array.push(high, low);
       }
     });
 
     const res = await Promise.all(array);
+    // console.log(res);
+
     const content = forest.content;
     res.forEach((obj) => {
       const { group, species, level, distance } = obj;
@@ -328,7 +322,7 @@ function main() {
       camera.position.set(-455, 148, -464);
       camera.lookAt(0, 0, 0);
       controls.target.set(0, 0, 0);
-      renderer.render(scene, camera);
+      render();
     },
     wander: function () {
       renderForWander();
@@ -351,20 +345,21 @@ function main() {
     watchTree6: function () {
       renderForWatch("idiot");
     },
-    watchTree7: function () {
+    watchGiantTree: function () {
       renderForWatch("nerd");
     },
   };
   const gui = new GUI();
   gui.add(obj, "reset");
   gui.add(obj, "wander");
-  gui.add(obj, "watchTree1");
-  gui.add(obj, "watchTree2");
-  gui.add(obj, "watchTree3");
-  gui.add(obj, "watchTree4");
-  gui.add(obj, "watchTree5");
-  gui.add(obj, "watchTree6");
-  gui.add(obj, "watchTree7");
+  const folder = gui.addFolder("watch");
+  folder.add(obj, "watchTree1");
+  folder.add(obj, "watchTree2");
+  folder.add(obj, "watchTree3");
+  folder.add(obj, "watchTree4");
+  folder.add(obj, "watchTree5");
+  folder.add(obj, "watchTree6");
+  folder.add(obj, "watchGiantTree");
 
   /////////////////////////////////////////////////////////////////////////////////
   // RENDER

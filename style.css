@@ -8,4 +8,23 @@ body {
   height: 100%;
   display: block;
   background-color: white;
+  /* NOTE This creates the fade in/out anumation */
+  opacity: 0;
+  transition: all 1s;
+}
+.container {
+  width: 450px;
+  border: 1px solid #6c9c2c;
+  height: 25px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+#bar {
+  background: #95ca0d;
+  float: left;
+  height: 100%;
+  text-align: center;
+  line-height: 150%;
 }

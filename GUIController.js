@@ -48,8 +48,7 @@ class GUIController {
     camera.position.set(pos.x + 70, pos.y + 70, pos.z + 70);
     camera.lookAt(pos);
     controls.target.set(pos.x, pos.y, pos.z);
-    // controls.update();
-    console.log(camera);
+    // console.log(camera);
   }
 }
 

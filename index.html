@@ -4,19 +4,23 @@
     <meta charset="utf-8" />
     <title>forest</title>
     <link rel="stylesheet" href="style.css" />
-  </head>
-  <body>
-    <canvas id="c"></canvas>
-    <!-- <script type="importmap">
+    <link rel="shortcut icon" href="favicon.ico" />
+    <script type="importmap">
       {
         "imports": {
           "three": "./node_modules/three/build/three.module.js",
           "three/addons/": "./node_modules/three/examples/jsm/"
         }
-      } -->
-    <!-- </script> -->
-    <script type="module" src="main.js">
+      }
+    </script>
+    <script type="module" defer src="main.js">
       // Our Javascript will go here.
     </script>
+  </head>
+  <body>
+    <canvas id="c"></canvas>
+    <div class="container">
+      <div id="bar" style="width: 0%">0%</div>
+    </div>
   </body>
 </html>
