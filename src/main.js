@@ -120,12 +120,12 @@ function main() {
       num: 8000,
       detail: [],
     },
-    {
-      url: "resources/models/trees/tree9",
-      species: "nerd",
-      num: 1,
-      detail: [],
-    },
+    // {
+    //   url: "resources/models/trees/tree9",
+    //   species: "nerd",
+    //   num: 1,
+    //   detail: [],
+    // },
     {
       url: "resources/models/trees/tree10",
       species: "coward",
@@ -250,14 +250,14 @@ function main() {
         );
         array.push(high, middle, low);
       } else {
-        high = promiseController(`${url}/high.glb`, species, "high", 1000);
+        high = promiseController(`${url}/high.glb`, species, "high", 1200);
         low = promiseController(`${url}/low.glb`, species, "low", 2000);
         array.push(high, low);
       }
     });
 
     const res = await Promise.all(array);
-    console.log(res);
+    // console.log(res);
 
     const content = forest.content;
     res.forEach((obj) => {
