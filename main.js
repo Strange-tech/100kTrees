@@ -87,37 +87,37 @@ function main() {
     {
       url: "resources/models/trees/tree1",
       species: "Macrophanerophytes",
-      num: 10000,
+      num: 8000,
       detail: [],
     },
     {
       url: "resources/models/trees/tree2",
       species: "Broadleaf",
-      num: 10000,
+      num: 8000,
       detail: [],
     },
     {
       url: "resources/models/trees/tree3",
       species: "Bamboo",
-      num: 10000,
+      num: 8000,
       detail: [],
     },
     {
       url: "resources/models/trees/tree4",
       species: "bullshit",
-      num: 10000,
+      num: 6000,
       detail: [],
     },
     {
       url: "resources/models/trees/tree7",
       species: "fuck",
-      num: 10000,
+      num: 8000,
       detail: [],
     },
     {
       url: "resources/models/trees/tree8",
       species: "idiot",
-      num: 10000,
+      num: 8000,
       detail: [],
     },
     {
@@ -129,13 +129,13 @@ function main() {
     {
       url: "resources/models/trees/tree10",
       species: "coward",
-      num: 10000,
+      num: 8000,
       detail: [],
     },
     {
       url: "resources/models/trees/tree11",
       species: "fool",
-      num: 10000,
+      num: 8000,
       detail: [],
     },
   ];
@@ -224,7 +224,7 @@ function main() {
       bar.style.width = bar.innerHTML =
         Math.floor((100 * loadCount) / 21) + "%";
       // console.log(loadCount);
-      if (loadCount === 21) {
+      if (loadCount === 19) {
         container.style.display = "none";
         canvas.style.opacity = 1;
         render();
@@ -240,13 +240,13 @@ function main() {
       let high, middle, low;
 
       if (index < 3) {
-        high = promiseController(`${url}/high.glb`, species, "high", 500);
+        high = promiseController(`${url}/high.glb`, species, "high", 800);
         low = promiseController(`${url}/low.glb`, species, "low", 3000);
         middle = promiseController(
           `${url}/middle.glb`,
           species,
           "middle",
-          1000
+          2000
         );
         array.push(high, middle, low);
       } else {
@@ -257,7 +257,7 @@ function main() {
     });
 
     const res = await Promise.all(array);
-    // console.log(res);
+    console.log(res);
 
     const content = forest.content;
     res.forEach((obj) => {

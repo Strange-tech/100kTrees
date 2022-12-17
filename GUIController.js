@@ -1,6 +1,4 @@
 import * as THREE from "three";
-import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
-// import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 
 /*************************************************************************************
  * CLASS NAME:  GUIController
@@ -45,7 +43,7 @@ class GUIController {
     const { camera, controls } = this;
     const pos = watchPos[treeSpecies];
 
-    camera.position.set(pos.x + 70, pos.y + 70, pos.z + 70);
+    camera.position.set(pos.x + 120, pos.y + 120, pos.z + 120);
     camera.lookAt(pos);
     controls.target.set(pos.x, pos.y, pos.z);
     // console.log(camera);
