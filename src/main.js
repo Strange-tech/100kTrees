@@ -8,10 +8,12 @@ import { Forest } from "./Forest.js";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { GUI } from "three/examples/jsm/libs/lil-gui.module.min.js";
+import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader.js";
 
 // import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 // import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 // import { GUI } from "three/addons/libs/lil-gui.module.min.js";
+// import { DRACOLoader } from "three/addons/loaders/DRACOLoader.js";
 
 function main() {
   // global variables
@@ -20,8 +22,8 @@ function main() {
   const container = document.querySelector(".container");
 
   const renderer = new THREE.WebGLRenderer({ canvas });
-  renderer.setClearColor(0x87cefa, 1);
-  // renderer.shadowMap.enabled = true;
+  // renderer.setClearColor(0x87cefa, 1);
+  // renderer.outputEncoding = THREE.sRGBEncoding;
 
   const scene = new THREE.Scene();
 
@@ -204,10 +206,14 @@ function main() {
   });
 
   let loadCount = 0;
-  const promiseController = function (url, species, level, distance) {
-    const loader = new GLTFLoader();
+  const loader = new GLTFLoader();
+  const dracoLoader = new DRACOLoader();
 
+  const promiseController = function (url, species, level, distance) {
     return new Promise((resolve) => {
+      dracoLoader.setDecoderPath("resources/draco/");
+      dracoLoader.preload();
+      loader.setDRACOLoader(dracoLoader);
       loader.load(url, (gltf) => {
         resolve({
           // 以下代码是为了妥协傻逼模型
@@ -240,7 +246,7 @@ function main() {
       let high, middle, low;
 
       if (index < 3) {
-        high = promiseController(`${url}/high.glb`, species, "high", 800);
+        high = promiseController(`${url}/highDraco.glb`, species, "high", 800);
         low = promiseController(`${url}/low.glb`, species, "low", 3000);
         middle = promiseController(
           `${url}/middle.glb`,
@@ -250,7 +256,7 @@ function main() {
         );
         array.push(high, middle, low);
       } else {
-        high = promiseController(`${url}/high.glb`, species, "high", 1200);
+        high = promiseController(`${url}/highDraco.glb`, species, "high", 1200);
         low = promiseController(`${url}/low.glb`, species, "low", 2000);
         array.push(high, low);
       }
