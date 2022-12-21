@@ -6,15 +6,15 @@ import { Terrain } from "./Terrain.js";
 import { GUIController } from "./GUIController.js";
 import { Forest } from "./Forest.js";
 import { GetBufferAttributes } from "../tools/GetBufferAttributes.js";
-// import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
-// import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
-// import { GUI } from "three/examples/jsm/libs/lil-gui.module.min.js";
-// import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader.js";
+import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
+import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
+import { GUI } from "three/examples/jsm/libs/lil-gui.module.min.js";
+import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader.js";
 
-import { OrbitControls } from "three/addons/controls/OrbitControls.js";
-import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
-import { GUI } from "three/addons/libs/lil-gui.module.min.js";
-import { DRACOLoader } from "three/addons/loaders/DRACOLoader.js";
+// import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+// import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
+// import { GUI } from "three/addons/libs/lil-gui.module.min.js";
+// import { DRACOLoader } from "three/addons/loaders/DRACOLoader.js";
 
 function main() {
   // global variables
