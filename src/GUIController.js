@@ -2,7 +2,7 @@ import * as THREE from "three";
 
 /*************************************************************************************
  * CLASS NAME:  GUIController
- * DESCRIPTION: use multiple cameras to watch different scenes
+ * DESCRIPTION: change the main camera to watch different scenes
  * NOTE:
  *
  *************************************************************************************/
@@ -16,6 +16,7 @@ class GUIController {
   }
 
   setWander(points, endTime) {
+    this.time = 0;
     this.curve = new THREE.CatmullRomCurve3(points, true, "catmullrom", 0.1);
     this.endTime = endTime;
   }
@@ -28,14 +29,14 @@ class GUIController {
   moveCamera() {
     const { camera, curve } = this;
     let points = curve.getPoints(3000);
-    this.time += 3;
+    this.time += 1;
     const index1 = this.time % 3000;
     const index2 = (this.time + 50) % 3000;
     let point = points[index1];
     let point1 = points[index2];
     if (point && point.x) {
       camera.position.set(point.x, point.y, point.z);
-      camera.lookAt(point1.x, point1.y, point1.z);
+      camera.lookAt(point1.x, point1.y - 50, point1.z);
     }
   }
 

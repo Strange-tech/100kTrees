@@ -5,15 +5,16 @@ import { LevelofDetail } from "./LevelofDetail.js";
 import { Terrain } from "./Terrain.js";
 import { GUIController } from "./GUIController.js";
 import { Forest } from "./Forest.js";
-import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
-import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
-import { GUI } from "three/examples/jsm/libs/lil-gui.module.min.js";
-import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader.js";
+import { GetBufferAttributes } from "../tools/GetBufferAttributes.js";
+// import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
+// import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
+// import { GUI } from "three/examples/jsm/libs/lil-gui.module.min.js";
+// import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader.js";
 
-// import { OrbitControls } from "three/addons/controls/OrbitControls.js";
-// import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
-// import { GUI } from "three/addons/libs/lil-gui.module.min.js";
-// import { DRACOLoader } from "three/addons/loaders/DRACOLoader.js";
+import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
+import { GUI } from "three/addons/libs/lil-gui.module.min.js";
+import { DRACOLoader } from "three/addons/loaders/DRACOLoader.js";
 
 function main() {
   // global variables
@@ -66,7 +67,7 @@ function main() {
   /////////////////////////////////////////////////////////////////////////////////
   // TERRAIN
   const planeSize = 20000;
-  const vertexNumber = 500;
+  const vertexNumber = 2000;
   const terrain = new Terrain(
     scene,
     planeSize,
@@ -267,6 +268,11 @@ function main() {
 
     const content = forest.content;
     res.forEach((obj) => {
+      // 统计模型信息，打印在控制台
+      console.log(`${obj.species}-${obj.level}: `);
+      new GetBufferAttributes(obj.group).getSceneModelFaceNum();
+
+      // 后续操作...
       const { group, species, level, distance } = obj;
       const id = forest.getIdBySpecies(species);
       content[id].detail.push({
@@ -296,29 +302,24 @@ function main() {
   // WATCH
   function renderForWatch(treeSpecies) {
     guiController.setWatch(treeSpecies, watchPos);
-    lods.forEach((lod) => {
-      lod.update(camera);
-    });
-    renderer.render(scene, camera);
+    render();
   }
 
   /////////////////////////////////////////////////////////////////////////////////
   // WANDER
   const points = [
-    new THREE.Vector3(8000, 200, 8000),
-    new THREE.Vector3(8000, 200, -8000),
-    new THREE.Vector3(-8000, 200, -8000),
-    new THREE.Vector3(-8000, 200, 8000),
+    new THREE.Vector3(2000, 200, 2000),
+    new THREE.Vector3(2000, 200, -2000),
+    new THREE.Vector3(-2000, 200, -2000),
+    new THREE.Vector3(-2000, 200, 2000),
   ];
-  const endTime = 3000;
-
-  guiController.setWander(points, endTime);
+  const endTime = 3000; // 划分为3000个点
 
   function renderForWander() {
     guiController.moveCamera();
+    render();
     let id = requestAnimationFrame(renderForWander);
     if (guiController.reachWanderEnd()) cancelAnimationFrame(id);
-    renderer.render(scene, camera);
   }
 
   /////////////////////////////////////////////////////////////////////////////////
@@ -331,6 +332,7 @@ function main() {
       render();
     },
     wander: function () {
+      guiController.setWander(points, endTime);
       renderForWander();
     },
     watchTree1: function () {
@@ -365,7 +367,6 @@ function main() {
   folder.add(obj, "watchTree4");
   folder.add(obj, "watchTree5");
   folder.add(obj, "watchTree6");
-  folder.add(obj, "watchGiantTree");
 
   /////////////////////////////////////////////////////////////////////////////////
   // RENDER
