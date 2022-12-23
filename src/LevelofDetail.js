@@ -155,8 +155,6 @@ class LevelofDetail {
           obj.meshes[j].material,
           obj.count
         );
-        // instancedMesh.castShadow = true;
-        // instancedMesh.receiveShadow = true;
         for (let k = 0; k < obj.count; k++) {
           instancedMesh.setMatrixAt(k, obj.matrix4[k]);
         }

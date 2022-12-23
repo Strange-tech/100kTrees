@@ -34,7 +34,6 @@ class Terrain {
     };
 
     this.mesh = new THREE.Mesh(this.planeGeometry, this.planeMaterial);
-    // this.mesh.receiveShadow = true;
   }
 
   setImprovedNoise(quality) {
@@ -65,15 +64,18 @@ class Terrain {
   }
 
   loadTexture(url) {
+    const { length, width } = this;
     const textureLoader = new THREE.TextureLoader();
     const texture = textureLoader.load(url);
     texture.wrapS = THREE.RepeatWrapping;
     texture.wrapT = THREE.RepeatWrapping;
+    const repeatsInlength = 16;
+    const repeatsInwidth = 16;
+    texture.repeat.set(repeatsInlength, repeatsInwidth);
     this.planeMaterial = new THREE.MeshLambertMaterial({
       map: texture,
-      side: THREE.DoubleSide,
+      // side: THREE.DoubleSide,
     });
-
     this.mesh.material = this.planeMaterial;
   }
 

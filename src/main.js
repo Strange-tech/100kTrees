@@ -196,21 +196,84 @@ function main() {
   const matrixArray = randomMatrix(vertices, totalNum);
   const forestMatrix = forestDistribute(forest, matrixArray);
 
-  const watchPos = {};
-  forest.content.forEach((tree) => {
-    let sp = tree.species;
-    watchPos[sp] = new THREE.Vector3(
-      forestMatrix[sp][0].elements[12],
-      forestMatrix[sp][0].elements[13],
-      forestMatrix[sp][0].elements[14]
-    );
-  });
-
+  /////////////////////////////////////////////////////////////////////////////////
+  // RENDER MODE
   let loadCount = 0;
   const loader = new GLTFLoader();
   const dracoLoader = new DRACOLoader();
+  // 1. renderWhileLoading
+  const promiseController1 = function (url, species, level, distance) {
+    const totalCount = 19;
+    return new Promise((resolve) => {
+      dracoLoader.setDecoderPath("resources/draco/");
+      dracoLoader.preload();
+      loader.setDRACOLoader(dracoLoader);
+      loader.load(url, (gltf) => {
+        resolve({
+          // 以下代码是为了妥协傻逼模型
+          group: gltf.scene.children[0].isMesh
+            ? gltf.scene.children
+            : gltf.scene.children[0].children,
+          species: species,
+          level: level,
+          distance: distance,
+        });
+      });
+    });
+  };
+  const renderWhileLoading = function (forest) {
+    canvas.style.opacity = 1;
+    forest.content.forEach(async (obj, index) => {
+      const { url, species, num } = obj;
+      let high, middle, low;
+      let res,
+        detail = [];
 
-  const promiseController = function (url, species, level, distance) {
+      if (index < 3) {
+        high = promiseController1(`${url}/highDraco.glb`, species, "high", 800);
+        low = promiseController1(`${url}/low.glb`, species, "low", 3000);
+        middle = promiseController1(
+          `${url}/middle.glb`,
+          species,
+          "middle",
+          2000
+        );
+        res = await Promise.all([high, middle, low]);
+      } else {
+        high = promiseController1(
+          `${url}/highDraco.glb`,
+          species,
+          "high",
+          1200
+        );
+        low = promiseController1(`${url}/low.glb`, species, "low", 2000);
+        // array.push(high, low);
+        res = await Promise.all([high, low]);
+      }
+      res.forEach((obj) => {
+        const { group, level, distance } = obj;
+        detail.push({
+          group: group,
+          level: level,
+          distance: distance,
+        });
+      });
+      const lod = new LevelofDetail(scene, camera, species);
+      lod.setLevels(detail);
+      lod.setPopulation(num);
+      for (let i = 0; i < num; i++) {
+        let matrix = forestMatrix[species][i];
+        lod.setTransform(i, matrix);
+      }
+      lods.push(lod);
+      render();
+    });
+  };
+  renderWhileLoading(forest); // choose one to carry out.
+
+  // 2. renderAfterLoading
+  const promiseController2 = function (url, species, level, distance) {
+    const totalCount = 19;
     return new Promise((resolve) => {
       dracoLoader.setDecoderPath("resources/draco/");
       dracoLoader.preload();
@@ -229,9 +292,9 @@ function main() {
     }).then((res) => {
       loadCount++;
       bar.style.width = bar.innerHTML =
-        Math.floor((100 * loadCount) / 21) + "%";
+        Math.floor((100 * loadCount) / totalCount) + "%";
       // console.log(loadCount);
-      if (loadCount === 19) {
+      if (loadCount === totalCount) {
         container.style.display = "none";
         canvas.style.opacity = 1;
         render();
@@ -239,17 +302,16 @@ function main() {
       return res;
     });
   };
-
-  const loadModel = async function (forest) {
+  const renderAfterLoading = async function (forest) {
     const array = [];
     forest.content.forEach((obj, index) => {
       const { url, species } = obj;
       let high, middle, low;
 
       if (index < 3) {
-        high = promiseController(`${url}/highDraco.glb`, species, "high", 800);
-        low = promiseController(`${url}/low.glb`, species, "low", 3000);
-        middle = promiseController(
+        high = promiseController2(`${url}/highDraco.glb`, species, "high", 800);
+        low = promiseController2(`${url}/low.glb`, species, "low", 3000);
+        middle = promiseController2(
           `${url}/middle.glb`,
           species,
           "middle",
@@ -257,21 +319,23 @@ function main() {
         );
         array.push(high, middle, low);
       } else {
-        high = promiseController(`${url}/highDraco.glb`, species, "high", 1200);
-        low = promiseController(`${url}/low.glb`, species, "low", 2000);
+        high = promiseController2(
+          `${url}/highDraco.glb`,
+          species,
+          "high",
+          1200
+        );
+        low = promiseController2(`${url}/low.glb`, species, "low", 2000);
         array.push(high, low);
       }
     });
-
     const res = await Promise.all(array);
     // console.log(res);
-
     const content = forest.content;
     res.forEach((obj) => {
       // 统计模型信息，打印在控制台
       console.log(`${obj.species}-${obj.level}: `);
       new GetBufferAttributes(obj.group).getSceneModelFaceNum();
-
       // 后续操作...
       const { group, species, level, distance } = obj;
       const id = forest.getIdBySpecies(species);
@@ -282,7 +346,6 @@ function main() {
       });
     });
     // console.log(forest);
-
     content.forEach((treeObj) => {
       const { detail, species, num } = treeObj;
       const lod = new LevelofDetail(scene, camera, species);
@@ -296,10 +359,19 @@ function main() {
     });
     render();
   };
-  loadModel(forest);
+  // renderAfterLoading(forest); // choose one to carry out.
 
   /////////////////////////////////////////////////////////////////////////////////
   // WATCH
+  const watchPos = {};
+  forest.content.forEach((tree) => {
+    let sp = tree.species;
+    watchPos[sp] = new THREE.Vector3(
+      forestMatrix[sp][0].elements[12],
+      forestMatrix[sp][0].elements[13],
+      forestMatrix[sp][0].elements[14]
+    );
+  });
   function renderForWatch(treeSpecies) {
     guiController.setWatch(treeSpecies, watchPos);
     render();

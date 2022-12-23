@@ -29,7 +29,7 @@ class GUIController {
   moveCamera() {
     const { camera, curve } = this;
     let points = curve.getPoints(3000);
-    this.time += 1;
+    this.time += 1; 
     const index1 = this.time % 3000;
     const index2 = (this.time + 50) % 3000;
     let point = points[index1];
