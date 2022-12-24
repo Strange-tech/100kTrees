@@ -5,6 +5,7 @@ import { LevelofDetail } from "./LevelofDetail.js";
 import { Terrain } from "./Terrain.js";
 import { GUIController } from "./GUIController.js";
 import { Forest } from "./Forest.js";
+import { QuadTree, Rectangle, Point } from "./QuadTree.js";
 import { GetBufferAttributes } from "../tools/GetBufferAttributes.js";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
@@ -153,21 +154,33 @@ function main() {
     const scale = new THREE.Vector3(1, 1, 1); // default
 
     const matrixArray = [];
-    const set = new Set();
     const array = vertices.array;
     const l = vertices.array.length / 3;
 
-    let idx;
-    while (set.size < num) {
-      idx = 3 * Math.floor(Math.random() * l);
-      set.add(idx);
-    }
+    const boundary = new Rectangle(0, 0, planeSize / 2, planeSize / 2);
+    const quadtree = new QuadTree(boundary, 10);
+    let cnt = 0;
+    while (cnt < num) {
+      let idx = 3 * Math.floor(Math.random() * l);
+      let x, y, z;
+      let r = 40;
+      let found; // 临近的point数组
+      do {
+        found = [];
+        idx = 3 * Math.floor(Math.random() * l);
+        x = array[idx];
+        z = array[idx + 2];
+        let range = new Rectangle(x, z, r, r);
+        quadtree.query(range, found);
+      } while (found.length > 0);
 
-    set.forEach((idx) => {
+      let point = new Point(x, z, r);
+      quadtree.insert(point);
+
       const matrix = new THREE.Matrix4();
-      position.x = array[idx];
-      position.y = array[idx + 1];
-      position.z = array[idx + 2];
+
+      y = array[idx + 1];
+      position.copy(new THREE.Vector3(x, y, z));
 
       // rotation.y = Math.random() * 2 * Math.PI;
 
@@ -176,7 +189,10 @@ function main() {
       matrix.compose(position, quaternion, scale);
 
       matrixArray.push(matrix);
-    });
+
+      cnt++;
+    }
+    // console.log(quadtree);
     return matrixArray;
   };
 
@@ -363,6 +379,7 @@ function main() {
 
   /////////////////////////////////////////////////////////////////////////////////
   // WATCH
+
   const watchPos = {};
   forest.content.forEach((tree) => {
     let sp = tree.species;
@@ -373,6 +390,13 @@ function main() {
     );
   });
   function renderForWatch(treeSpecies) {
+    // const pos = watchPos[treeSpecies];
+    // const cube = new THREE.Mesh(
+    //   new THREE.SphereGeometry(25),
+    //   new THREE.MeshBasicMaterial({ color: "red" })
+    // );
+    // cube.position.set(pos.x, pos.y, pos.z);
+    // scene.add(cube);
     guiController.setWatch(treeSpecies, watchPos);
     render();
   }
@@ -425,8 +449,11 @@ function main() {
     watchTree6: function () {
       renderForWatch("idiot");
     },
-    watchGiantTree: function () {
-      renderForWatch("nerd");
+    watchTree7: function () {
+      renderForWatch("coward");
+    },
+    watchTree8: function () {
+      renderForWatch("fool");
     },
   };
   const gui = new GUI();
@@ -439,6 +466,8 @@ function main() {
   folder.add(obj, "watchTree4");
   folder.add(obj, "watchTree5");
   folder.add(obj, "watchTree6");
+  folder.add(obj, "watchTree7");
+  folder.add(obj, "watchTree8");
 
   /////////////////////////////////////////////////////////////////////////////////
   // RENDER

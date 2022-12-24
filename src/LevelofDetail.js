@@ -60,11 +60,11 @@ class LevelofDetail {
   setTransform(index, matrix4) {
     const { transformation, treeSpecies } = this;
     const k = 0.02; // 有些glb模型本身太大，乘以缩小系数
-    const d = 1.5; // 整体缩放系数
+    const d = 1; // 整体缩放系数
     let scale = k;
     switch (treeSpecies) {
       case "Macrophanerophytes":
-        scale = Math.random() * 0.5 + 1.5; // (1.5, 2)
+        scale = Math.random() * 1 + 1.5; // (1.5, 2.5)
         break;
       case "Broadleaf":
         scale = Math.random() * 0.5 + 1; // (1, 1.5)
@@ -79,7 +79,7 @@ class LevelofDetail {
         scale = k * (Math.random() * 1 + 2); // (2, 3)
         break;
       case "idiot":
-        scale = k * (Math.random() * 1 + 1); // (1, 2)
+        scale = k * (Math.random() * 0.5 + 0.5); // (0.5, 1)
         break;
       case "nerd":
         scale = k * (Math.random() * 5 + 10); // (10, 15)

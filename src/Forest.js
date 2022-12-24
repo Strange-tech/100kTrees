@@ -1,5 +1,3 @@
-import * as THREE from "three";
-
 /*************************************************************************************
  * CLASS NAME:  Forest
  * DESCRIPTION:
@@ -13,9 +11,11 @@ class Forest {
       return acc + cur.num;
     }, 0);
   }
+
   getTotalNum() {
     return this.totalNum;
   }
+
   getIdBySpecies(species) {
     const { content } = this;
     const id = content.findIndex((obj) => {

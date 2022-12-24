@@ -1,6 +1,5 @@
-import * as THREE from "three";
 /*************************************************************************************
- * CLASS NAME:  Forest
+ * CLASS NAME:  GetBufferAttributes
  * DESCRIPTION:
  * NOTE:
  *

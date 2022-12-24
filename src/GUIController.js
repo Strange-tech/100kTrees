@@ -2,8 +2,8 @@ import * as THREE from "three";
 
 /*************************************************************************************
  * CLASS NAME:  GUIController
- * DESCRIPTION: change the main camera to watch different scenes
- * NOTE:
+ * DESCRIPTION: Change the main camera to watch different scenes
+ * NOTE:        There are only one camera
  *
  *************************************************************************************/
 class GUIController {
@@ -29,7 +29,7 @@ class GUIController {
   moveCamera() {
     const { camera, curve } = this;
     let points = curve.getPoints(3000);
-    this.time += 1; 
+    this.time += 1;
     const index1 = this.time % 3000;
     const index2 = (this.time + 50) % 3000;
     let point = points[index1];
