@@ -94,9 +94,9 @@ class LevelofDetail {
         break;
     }
     scale *= d;
-    matrix4.elements[0] = scale;
-    matrix4.elements[5] = scale;
-    matrix4.elements[10] = scale;
+    const scaleMatrix = new THREE.Matrix4();
+    scaleMatrix.makeScale(scale, scale, scale);
+    matrix4.multiply(scaleMatrix);
     transformation[index] = matrix4;
   }
 
@@ -125,7 +125,7 @@ class LevelofDetail {
       numOfLevel,
     } = this;
 
-    //clear
+    // clear
     for (let i = 0; i < numOfLevel; i++) {
       instancedMeshOfAllLevel[i].count = 0;
       instancedMeshOfAllLevel[i].matrix4 = [];

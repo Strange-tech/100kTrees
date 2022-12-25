@@ -1,7 +1,7 @@
 /*************************************************************************************
  * CLASS NAME:  QuadTree
  * DESCRIPTION: Scene manager, assuring trees not to be too closed to each other
- * NOTE:        Do it by myself
+ * NOTE:        
  *
  *************************************************************************************/
 class QuadTree {

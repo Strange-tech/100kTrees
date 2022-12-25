@@ -148,10 +148,9 @@ function main() {
   const totalNum = forest.getTotalNum(); // 十万级别的森林
 
   const randomMatrix = function (vertices, num) {
-    const position = new THREE.Vector3();
-    const rotation = new THREE.Euler();
-    const quaternion = new THREE.Quaternion();
-    const scale = new THREE.Vector3(1, 1, 1); // default
+    const trans = new THREE.Matrix4();
+    const rot = new THREE.Matrix4();
+    const scl = new THREE.Matrix4();
 
     const matrixArray = [];
     const array = vertices.array;
@@ -180,13 +179,13 @@ function main() {
       const matrix = new THREE.Matrix4();
 
       y = array[idx + 1];
-      position.copy(new THREE.Vector3(x, y, z));
+      trans.makeTranslation(x, y, z);
 
-      // rotation.y = Math.random() * 2 * Math.PI;
+      rot.makeRotationY(Math.random() * 2 * Math.PI);
 
-      quaternion.setFromEuler(rotation);
+      scl.makeScale(1, 1, 1);
 
-      matrix.compose(position, quaternion, scale);
+      matrix.multiply(trans).multiply(rot).multiply(scl);
 
       matrixArray.push(matrix);
 

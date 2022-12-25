@@ -25,15 +25,13 @@ class Terrain {
     );
     this.planeGeometry.rotateX(-Math.PI / 2);
 
-    this.planeMaterial = new THREE.MeshBasicMaterial(); // default material
+    this.planeMaterial; // default material
 
     this.vertices = {
       length: lengthVertex,
       width: widthVertex,
       array: this.planeGeometry.attributes.position.array, // array of 3 * lengthVertex * widthVertex
     };
-
-    this.mesh = new THREE.Mesh(this.planeGeometry, this.planeMaterial);
   }
 
   setImprovedNoise(quality) {
@@ -64,7 +62,6 @@ class Terrain {
   }
 
   loadTexture(url) {
-    const { length, width } = this;
     const textureLoader = new THREE.TextureLoader();
     const texture = textureLoader.load(url);
     texture.wrapS = THREE.RepeatWrapping;
@@ -74,13 +71,12 @@ class Terrain {
     texture.repeat.set(repeatsInlength, repeatsInwidth);
     this.planeMaterial = new THREE.MeshLambertMaterial({
       map: texture,
-      // side: THREE.DoubleSide,
     });
-    this.mesh.material = this.planeMaterial;
   }
 
   addToScene() {
-    this.scene.add(this.mesh);
+    const mesh = new THREE.Mesh(this.planeGeometry, this.planeMaterial);
+    this.scene.add(mesh);
   }
 }
 
