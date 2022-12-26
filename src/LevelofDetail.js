@@ -8,11 +8,10 @@ import * as THREE from "three";
  *
  *************************************************************************************/
 class LevelofDetail {
-  constructor(scene, camera, treeSpecies) {
+  constructor(scene, treeSpecies) {
     this.treeSpecies = treeSpecies;
     this.numOfLevel = 0;
     this.scene = scene;
-    this.camera = camera;
     this.levels = undefined;
     this.instancedMeshOfAllLevel = undefined;
     this.groupOfInstances = undefined;
@@ -111,13 +110,15 @@ class LevelofDetail {
     return length - 1;
   }
 
+  getLastLevel() {
+    return this.levels.length - 1;
+  }
+
   getSpecies() {
     return this.treeSpecies;
   }
 
   update(camera) {
-    this.camera = camera;
-
     const {
       instancedMeshOfAllLevel,
       groupOfInstances,
@@ -131,6 +132,14 @@ class LevelofDetail {
       instancedMeshOfAllLevel[i].matrix4 = [];
     }
 
+    // update camera frustum
+    const frustum = new THREE.Frustum();
+    frustum.setFromProjectionMatrix(
+      new THREE.Matrix4().multiplyMatrices(
+        camera.projectionMatrix,
+        camera.matrixWorldInverse
+      )
+    );
     let obj_position, cur_dist, cur_level;
     const cam_position = camera.position;
     transformation?.forEach((t) => {
@@ -139,11 +148,17 @@ class LevelofDetail {
         t.elements[13],
         t.elements[14]
       );
-      cur_dist = obj_position.distanceTo(cam_position);
-      cur_level = this.getDistanceLevel(cur_dist);
-      // console.log(cur_dist, cur_level);
-      instancedMeshOfAllLevel[cur_level].count++;
-      instancedMeshOfAllLevel[cur_level].matrix4.push(t);
+      // only care about meshes in frustum, aka frustum culling
+      if (frustum.containsPoint(obj_position)) {
+        cur_dist = obj_position.distanceTo(cam_position);
+        cur_level = this.getDistanceLevel(cur_dist);
+        instancedMeshOfAllLevel[cur_level].count++;
+        instancedMeshOfAllLevel[cur_level].matrix4.push(t);
+      } else {
+        cur_level = this.getLastLevel();
+        instancedMeshOfAllLevel[cur_level].count++;
+        instancedMeshOfAllLevel[cur_level].matrix4.push(t);
+      }
     });
 
     // console.log("instancedMeshOfAllLevel:", instancedMeshOfAllLevel);

@@ -1,6 +1,5 @@
 import * as THREE from "three";
 import { ImprovedNoise } from "three/examples/jsm/math/ImprovedNoise.js";
-// import { ImprovedNoise } from "three/addons/math/ImprovedNoise.js";
 
 /*************************************************************************************
  * CLASS NAME:  Terrain

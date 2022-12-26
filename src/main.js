@@ -12,18 +12,13 @@ import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { GUI } from "three/examples/jsm/libs/lil-gui.module.min.js";
 import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader.js";
 
-// import { OrbitControls } from "three/addons/controls/OrbitControls.js";
-// import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
-// import { GUI } from "three/addons/libs/lil-gui.module.min.js";
-// import { DRACOLoader } from "three/addons/loaders/DRACOLoader.js";
-
 function main() {
   // global variables
   const canvas = document.querySelector("#c");
   const bar = document.querySelector("#bar");
   const container = document.querySelector(".container");
 
-  const renderer = new THREE.WebGLRenderer({ canvas });
+  const renderer = new THREE.WebGLRenderer({ canvas: canvas });
   // renderer.setClearColor(0x87cefa, 1);
   // renderer.outputEncoding = THREE.sRGBEncoding;
 
@@ -34,7 +29,7 @@ function main() {
   const near = 0.1;
   const far = 50000;
   const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
-  camera.position.set(-455, 148, -464);
+  camera.position.set(-455, 300, -464);
   camera.lookAt(0, 0, 0);
 
   {
@@ -91,37 +86,37 @@ function main() {
     {
       url: "resources/models/trees/tree1",
       species: "Macrophanerophytes",
-      num: 8000,
+      num: 10000,
       detail: [],
     },
     {
       url: "resources/models/trees/tree2",
       species: "Broadleaf",
-      num: 8000,
+      num: 10000,
       detail: [],
     },
     {
       url: "resources/models/trees/tree3",
       species: "Bamboo",
-      num: 8000,
+      num: 10000,
       detail: [],
     },
     {
       url: "resources/models/trees/tree4",
       species: "bullshit",
-      num: 6000,
+      num: 8000,
       detail: [],
     },
     {
       url: "resources/models/trees/tree7",
       species: "fuck",
-      num: 8000,
+      num: 10000,
       detail: [],
     },
     {
       url: "resources/models/trees/tree8",
       species: "idiot",
-      num: 8000,
+      num: 10000,
       detail: [],
     },
     // {
@@ -133,13 +128,13 @@ function main() {
     {
       url: "resources/models/trees/tree10",
       species: "coward",
-      num: 8000,
+      num: 10000,
       detail: [],
     },
     {
       url: "resources/models/trees/tree11",
       species: "fool",
-      num: 8000,
+      num: 10000,
       detail: [],
     },
   ];
@@ -245,13 +240,18 @@ function main() {
         detail = [];
 
       if (index < 3) {
-        high = promiseController1(`${url}/highDraco.glb`, species, "high", 800);
-        low = promiseController1(`${url}/low.glb`, species, "low", 3000);
+        high = promiseController1(
+          `${url}/highDraco.glb`,
+          species,
+          "high",
+          1200
+        );
+        low = promiseController1(`${url}/low.glb`, species, "low", 4000);
         middle = promiseController1(
           `${url}/middle.glb`,
           species,
           "middle",
-          2000
+          3000
         );
         res = await Promise.all([high, middle, low]);
       } else {
@@ -259,9 +259,9 @@ function main() {
           `${url}/highDraco.glb`,
           species,
           "high",
-          1200
+          2000
         );
-        low = promiseController1(`${url}/low.glb`, species, "low", 2000);
+        low = promiseController1(`${url}/low.glb`, species, "low", 3000);
         // array.push(high, low);
         res = await Promise.all([high, low]);
       }
@@ -273,7 +273,7 @@ function main() {
           distance: distance,
         });
       });
-      const lod = new LevelofDetail(scene, camera, species);
+      const lod = new LevelofDetail(scene, species);
       lod.setLevels(detail);
       lod.setPopulation(num);
       for (let i = 0; i < num; i++) {
@@ -363,7 +363,7 @@ function main() {
     // console.log(forest);
     content.forEach((treeObj) => {
       const { detail, species, num } = treeObj;
-      const lod = new LevelofDetail(scene, camera, species);
+      const lod = new LevelofDetail(scene, species);
       lod.setLevels(detail);
       lod.setPopulation(num);
       for (let i = 0; i < num; i++) {
@@ -389,13 +389,6 @@ function main() {
     );
   });
   function renderForWatch(treeSpecies) {
-    // const pos = watchPos[treeSpecies];
-    // const cube = new THREE.Mesh(
-    //   new THREE.SphereGeometry(25),
-    //   new THREE.MeshBasicMaterial({ color: "red" })
-    // );
-    // cube.position.set(pos.x, pos.y, pos.z);
-    // scene.add(cube);
     guiController.setWatch(treeSpecies, watchPos);
     render();
   }
@@ -493,7 +486,6 @@ function main() {
     lods.forEach((lod) => {
       lod.update(camera);
     });
-
     // controls.update();
     renderer.render(scene, camera);
   }

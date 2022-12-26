@@ -9,10 +9,10 @@ body {
   display: block;
   background-color: white;
   /* NOTE This creates the fade in/out anumation */
-  opacity: 0;
-  transition: all 1s;
+  /* opacity: 0;
+  transition: all 1s; */
 }
-.container {
+/* .container {
   width: 450px;
   border: 1px solid #6c9c2c;
   height: 25px;
@@ -27,4 +27,4 @@ body {
   height: 100%;
   text-align: center;
   line-height: 150%;
-}
+} */
