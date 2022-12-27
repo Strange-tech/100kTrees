@@ -17,7 +17,7 @@ class GUIController {
 
   setWander(points, endTime) {
     this.time = 0;
-    this.curve = new THREE.CatmullRomCurve3(points, true, "catmullrom", 0.1);
+    this.curve = new THREE.CatmullRomCurve3(points);
     this.endTime = endTime;
   }
 
@@ -28,16 +28,13 @@ class GUIController {
 
   moveCamera() {
     const { camera, curve } = this;
-    let points = curve.getPoints(3000);
-    this.time += 1;
-    const index1 = this.time % 3000;
-    const index2 = (this.time + 50) % 3000;
-    let point = points[index1];
-    let point1 = points[index2];
-    if (point && point.x) {
-      camera.position.set(point.x, point.y, point.z);
-      camera.lookAt(point1.x, point1.y - 50, point1.z);
-    }
+    let points = curve.getPoints(1000);
+    this.time += 2;
+    const index = this.time % 1000;
+    let point = points[index];
+
+    camera.position.set(point.x, point.y, point.z);
+    camera.lookAt(0, 0, 0);
   }
 
   setWatch(treeSpecies, watchPos) {

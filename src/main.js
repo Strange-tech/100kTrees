@@ -6,7 +6,7 @@ import { Terrain } from "./Terrain.js";
 import { GUIController } from "./GUIController.js";
 import { Forest } from "./Forest.js";
 import { QuadTree, Rectangle, Point } from "./QuadTree.js";
-import { GetBufferAttributes } from "../tools/GetBufferAttributes.js";
+// import { GetBufferAttributes } from "../tools/GetBufferAttributes.js";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { GUI } from "three/examples/jsm/libs/lil-gui.module.min.js";
@@ -15,11 +15,8 @@ import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader.js";
 function main() {
   // global variables
   const canvas = document.querySelector("#c");
-  const bar = document.querySelector("#bar");
-  const container = document.querySelector(".container");
 
   const renderer = new THREE.WebGLRenderer({ canvas: canvas });
-  // renderer.setClearColor(0x87cefa, 1);
   // renderer.outputEncoding = THREE.sRGBEncoding;
 
   const scene = new THREE.Scene();
@@ -41,7 +38,6 @@ function main() {
 
   const controls = new OrbitControls(camera, canvas);
   controls.target.set(0, 5, 0);
-  // controls.autoRotate = true;
 
   const guiController = new GUIController(camera, controls);
 
@@ -108,31 +104,31 @@ function main() {
       detail: [],
     },
     {
-      url: "resources/models/trees/tree7",
+      url: "resources/models/trees/tree5",
       species: "fuck",
       num: 10000,
       detail: [],
     },
     {
-      url: "resources/models/trees/tree8",
+      url: "resources/models/trees/tree6",
       species: "idiot",
       num: 10000,
       detail: [],
     },
-    // {
-    //   url: "resources/models/trees/tree9",
-    //   species: "nerd",
-    //   num: 1,
-    //   detail: [],
-    // },
     {
-      url: "resources/models/trees/tree10",
+      url: "resources/models/trees/tree7",
+      species: "nerd",
+      num: 1,
+      detail: [],
+    },
+    {
+      url: "resources/models/trees/tree8",
       species: "coward",
       num: 10000,
       detail: [],
     },
     {
-      url: "resources/models/trees/tree11",
+      url: "resources/models/trees/tree9",
       species: "fool",
       num: 10000,
       detail: [],
@@ -220,10 +216,7 @@ function main() {
       loader.setDRACOLoader(dracoLoader);
       loader.load(url, (gltf) => {
         resolve({
-          // 以下代码是为了妥协傻逼模型
-          group: gltf.scene.children[0].isMesh
-            ? gltf.scene.children
-            : gltf.scene.children[0].children,
+          group: gltf.scene,
           species: species,
           level: level,
           distance: distance,
@@ -232,7 +225,7 @@ function main() {
     });
   };
   const renderWhileLoading = function (forest) {
-    canvas.style.opacity = 1;
+    // canvas.style.opacity = 1;
     forest.content.forEach(async (obj, index) => {
       const { url, species, num } = obj;
       let high, middle, low;
@@ -262,7 +255,6 @@ function main() {
           2000
         );
         low = promiseController1(`${url}/low.glb`, species, "low", 3000);
-        // array.push(high, low);
         res = await Promise.all([high, low]);
       }
       res.forEach((obj) => {
@@ -273,6 +265,7 @@ function main() {
           distance: distance,
         });
       });
+      // console.log(detail);
       const lod = new LevelofDetail(scene, species);
       lod.setLevels(detail);
       lod.setPopulation(num);
@@ -286,95 +279,92 @@ function main() {
   };
   renderWhileLoading(forest); // choose one to carry out.
 
-  // 2. renderAfterLoading
-  const promiseController2 = function (url, species, level, distance) {
-    const totalCount = 19;
-    return new Promise((resolve) => {
-      dracoLoader.setDecoderPath("resources/draco/");
-      dracoLoader.preload();
-      loader.setDRACOLoader(dracoLoader);
-      loader.load(url, (gltf) => {
-        resolve({
-          // 以下代码是为了妥协傻逼模型
-          group: gltf.scene.children[0].isMesh
-            ? gltf.scene.children
-            : gltf.scene.children[0].children,
-          species: species,
-          level: level,
-          distance: distance,
-        });
-      });
-    }).then((res) => {
-      loadCount++;
-      bar.style.width = bar.innerHTML =
-        Math.floor((100 * loadCount) / totalCount) + "%";
-      // console.log(loadCount);
-      if (loadCount === totalCount) {
-        container.style.display = "none";
-        canvas.style.opacity = 1;
-        render();
-      }
-      return res;
-    });
-  };
-  const renderAfterLoading = async function (forest) {
-    const array = [];
-    forest.content.forEach((obj, index) => {
-      const { url, species } = obj;
-      let high, middle, low;
+  // // 2. renderAfterLoading
+  // const promiseController2 = function (url, species, level, distance) {
+  //   const totalCount = 19;
+  //   return new Promise((resolve) => {
+  //     dracoLoader.setDecoderPath("resources/draco/");
+  //     dracoLoader.preload();
+  //     loader.setDRACOLoader(dracoLoader);
+  //     loader.load(url, (gltf) => {
+  //       resolve({
+  //         group: gltf.scene,
+  //         species: species,
+  //         level: level,
+  //         distance: distance,
+  //       });
+  //     });
+  //   }).then((res) => {
+  //     loadCount++;
+  //     bar.style.width = bar.innerHTML =
+  //       Math.floor((100 * loadCount) / totalCount) + "%";
+  //     // console.log(loadCount);
+  //     if (loadCount === totalCount) {
+  //       container.style.display = "none";
+  //       canvas.style.opacity = 1;
+  //       render();
+  //     }
+  //     return res;
+  //   });
+  // };
+  // const renderAfterLoading = async function (forest) {
+  //   const array = [];
+  //   forest.content.forEach((obj, index) => {
+  //     const { url, species } = obj;
+  //     let high, middle, low;
 
-      if (index < 3) {
-        high = promiseController2(`${url}/highDraco.glb`, species, "high", 800);
-        low = promiseController2(`${url}/low.glb`, species, "low", 3000);
-        middle = promiseController2(
-          `${url}/middle.glb`,
-          species,
-          "middle",
-          2000
-        );
-        array.push(high, middle, low);
-      } else {
-        high = promiseController2(
-          `${url}/highDraco.glb`,
-          species,
-          "high",
-          1200
-        );
-        low = promiseController2(`${url}/low.glb`, species, "low", 2000);
-        array.push(high, low);
-      }
-    });
-    const res = await Promise.all(array);
-    // console.log(res);
-    const content = forest.content;
-    res.forEach((obj) => {
-      // 统计模型信息，打印在控制台
-      console.log(`${obj.species}-${obj.level}: `);
-      new GetBufferAttributes(obj.group).getSceneModelFaceNum();
-      // 后续操作...
-      const { group, species, level, distance } = obj;
-      const id = forest.getIdBySpecies(species);
-      content[id].detail.push({
-        group: group,
-        level: level,
-        distance: distance,
-      });
-    });
-    // console.log(forest);
-    content.forEach((treeObj) => {
-      const { detail, species, num } = treeObj;
-      const lod = new LevelofDetail(scene, species);
-      lod.setLevels(detail);
-      lod.setPopulation(num);
-      for (let i = 0; i < num; i++) {
-        let matrix = forestMatrix[species][i];
-        lod.setTransform(i, matrix);
-      }
-      lods.push(lod);
-    });
-    render();
-  };
-  // renderAfterLoading(forest); // choose one to carry out.
+  //     if (index < 3) {
+  //       high = promiseController2(`${url}/highDraco.glb`, species, "high", 800);
+  //       low = promiseController2(`${url}/low.glb`, species, "low", 3000);
+  //       middle = promiseController2(
+  //         `${url}/middle.glb`,
+  //         species,
+  //         "middle",
+  //         2000
+  //       );
+  //       array.push(high, middle, low);
+  //     } else {
+  //       high = promiseController2(
+  //         `${url}/highDraco.glb`,
+  //         species,
+  //         "high",
+  //         1200
+  //       );
+  //       low = promiseController2(`${url}/low.glb`, species, "low", 2000);
+  //       array.push(high, low);
+  //     }
+  //   });
+  //   const res = await Promise.all(array);
+  //   // console.log(res);
+  //   const content = forest.content;
+  //   res.forEach((obj) => {
+  //     // 统计模型信息，打印在控制台
+  //     console.log(`${obj.species}-${obj.level}: `);
+  //     new GetBufferAttributes(obj.group).getSceneModelFaceNum();
+  //     // 后续操作...
+  //     const { group, species, level, distance } = obj;
+  //     const id = forest.getIdBySpecies(species);
+  //     content[id].detail.push({
+  //       group: group,
+  //       level: level,
+  //       distance: distance,
+  //     });
+  //   });
+  //   // console.log(forest);
+  //   content.forEach((treeObj) => {
+  //     const { detail, species, num } = treeObj;
+  //     const lod = new LevelofDetail(scene, species);
+  //     lod.setLevels(detail);
+  //     lod.setPopulation(num);
+  //     for (let i = 0; i < num; i++) {
+  //       let matrix = forestMatrix[species][i];
+  //       lod.setTransform(i, matrix);
+  //     }
+  //     lods.push(lod);
+  //   });
+  //   render();
+  // };
+  // // renderAfterLoading(forest); // choose one to carry out.
 
   /////////////////////////////////////////////////////////////////////////////////
   // WATCH
@@ -396,12 +386,12 @@ function main() {
   /////////////////////////////////////////////////////////////////////////////////
   // WANDER
   const points = [
-    new THREE.Vector3(2000, 200, 2000),
-    new THREE.Vector3(2000, 200, -2000),
-    new THREE.Vector3(-2000, 200, -2000),
-    new THREE.Vector3(-2000, 200, 2000),
+    new THREE.Vector3(4000, 3000, 0),
+    new THREE.Vector3(4000, 600, 0),
+    new THREE.Vector3(2000, 200, 0),
+    new THREE.Vector3(600, 200, 0),
   ];
-  const endTime = 3000; // 划分为3000个点
+  const endTime = 990; // 划分为1000个点
 
   function renderForWander() {
     guiController.moveCamera();
@@ -486,12 +476,10 @@ function main() {
     lods.forEach((lod) => {
       lod.update(camera);
     });
-    // controls.update();
     renderer.render(scene, camera);
   }
 
   function requestRenderIfNotRequested() {
-    // console.log(renderRequested);
     if (!renderRequested) {
       renderRequested = true;
       requestAnimationFrame(render);

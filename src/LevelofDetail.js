@@ -12,10 +12,16 @@ class LevelofDetail {
     this.treeSpecies = treeSpecies;
     this.numOfLevel = 0;
     this.scene = scene;
-    this.levels = undefined;
-    this.instancedMeshOfAllLevel = undefined;
-    this.groupOfInstances = undefined;
-    this.transformation = undefined; // 存储所有模型的变换（Matrix4），不随 update() 而改变
+    this.levels;
+    this.instancedMeshOfAllLevel;
+    this.groupOfInstances;
+    this.transformation; // 存储所有模型的变换（Matrix4），不随 update() 而改变
+  }
+
+  extractMeshes(group) {
+    return group.children[0].isMesh
+      ? group.children
+      : group.children[0].children;
   }
 
   setLevels(array) {
@@ -23,15 +29,12 @@ class LevelofDetail {
     this.numOfLevel = array.length;
     this.levels = new Array(this.numOfLevel);
     for (let i = 0; i < this.numOfLevel; i++) {
-      this.levels[i] = {
-        distance: array[i].distance,
-        group: array[i].group,
-      };
+      this.levels[i] = array[i].distance;
     }
     this.instancedMeshOfAllLevel = new Array(this.numOfLevel); // array of { mesh:[], count, matrix4:[] }
     for (let i = 0; i < this.numOfLevel; i++) {
       this.instancedMeshOfAllLevel[i] = {
-        meshes: [...array[i].group],
+        meshes: this.extractMeshes(array[i].group),
         count: 0,
         matrix4: [],
       };
@@ -59,8 +62,7 @@ class LevelofDetail {
   setTransform(index, matrix4) {
     const { transformation, treeSpecies } = this;
     const k = 0.02; // 有些glb模型本身太大，乘以缩小系数
-    const d = 1; // 整体缩放系数
-    let scale = k;
+    let scale = 1; // default scale
     switch (treeSpecies) {
       case "Macrophanerophytes":
         scale = Math.random() * 1 + 1.5; // (1.5, 2.5)
@@ -92,7 +94,6 @@ class LevelofDetail {
       default:
         break;
     }
-    scale *= d;
     const scaleMatrix = new THREE.Matrix4();
     scaleMatrix.makeScale(scale, scale, scale);
     matrix4.multiply(scaleMatrix);
@@ -103,7 +104,7 @@ class LevelofDetail {
     const { levels } = this;
     const length = levels.length;
     for (let i = 0; i < length; i++) {
-      if (dist <= levels[i].distance) {
+      if (dist <= levels[i]) {
         return i;
       }
     }
@@ -124,6 +125,7 @@ class LevelofDetail {
       groupOfInstances,
       transformation,
       numOfLevel,
+      boundingBox,
     } = this;
 
     // clear
@@ -148,9 +150,9 @@ class LevelofDetail {
         t.elements[13],
         t.elements[14]
       );
+      cur_dist = obj_position.distanceTo(cam_position);
       // only care about meshes in frustum, aka frustum culling
-      if (frustum.containsPoint(obj_position)) {
-        cur_dist = obj_position.distanceTo(cam_position);
+      if (cur_dist <= 800 || frustum.containsPoint(obj_position)) {
         cur_level = this.getDistanceLevel(cur_dist);
         instancedMeshOfAllLevel[cur_level].count++;
         instancedMeshOfAllLevel[cur_level].matrix4.push(t);
