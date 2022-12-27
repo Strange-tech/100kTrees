@@ -23,10 +23,10 @@ function main() {
 
   const fov = 45;
   const aspect = 2;
-  const near = 0.1;
+  const near = 1;
   const far = 50000;
   const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
-  camera.position.set(-455, 300, -464);
+  camera.position.set(0, 600, 0);
   camera.lookAt(0, 0, 0);
 
   {
@@ -88,13 +88,13 @@ function main() {
     {
       url: "resources/models/trees/tree2",
       species: "Broadleaf",
-      num: 10000,
+      num: 12000,
       detail: [],
     },
     {
       url: "resources/models/trees/tree3",
       species: "Bamboo",
-      num: 10000,
+      num: 20000,
       detail: [],
     },
     {
@@ -115,12 +115,12 @@ function main() {
       num: 10000,
       detail: [],
     },
-    {
-      url: "resources/models/trees/tree7",
-      species: "nerd",
-      num: 1,
-      detail: [],
-    },
+    // {
+    //   url: "resources/models/trees/tree7",
+    //   species: "nerd",
+    //   num: 1,
+    //   detail: [],
+    // },
     {
       url: "resources/models/trees/tree8",
       species: "coward",
@@ -204,12 +204,10 @@ function main() {
 
   /////////////////////////////////////////////////////////////////////////////////
   // RENDER MODE
-  let loadCount = 0;
   const loader = new GLTFLoader();
   const dracoLoader = new DRACOLoader();
   // 1. renderWhileLoading
   const promiseController1 = function (url, species, level, distance) {
-    const totalCount = 19;
     return new Promise((resolve) => {
       dracoLoader.setDecoderPath("resources/draco/");
       dracoLoader.preload();
@@ -387,9 +385,9 @@ function main() {
   // WANDER
   const points = [
     new THREE.Vector3(4000, 3000, 0),
-    new THREE.Vector3(4000, 600, 0),
-    new THREE.Vector3(2000, 200, 0),
-    new THREE.Vector3(600, 200, 0),
+    new THREE.Vector3(4000, 300, 0),
+    new THREE.Vector3(2000, 180, 0),
+    new THREE.Vector3(600, 180, 0),
   ];
   const endTime = 990; // 划分为1000个点
 

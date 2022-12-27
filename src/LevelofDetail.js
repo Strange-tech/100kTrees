@@ -125,7 +125,6 @@ class LevelofDetail {
       groupOfInstances,
       transformation,
       numOfLevel,
-      boundingBox,
     } = this;
 
     // clear
