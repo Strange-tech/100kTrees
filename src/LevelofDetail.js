@@ -126,13 +126,11 @@ class LevelofDetail {
       transformation,
       numOfLevel,
     } = this;
-
     // clear
     for (let i = 0; i < numOfLevel; i++) {
       instancedMeshOfAllLevel[i].count = 0;
       instancedMeshOfAllLevel[i].matrix4 = [];
     }
-
     // update camera frustum
     const frustum = new THREE.Frustum();
     frustum.setFromProjectionMatrix(
@@ -161,7 +159,6 @@ class LevelofDetail {
         instancedMeshOfAllLevel[cur_level].matrix4.push(t);
       }
     });
-
     // console.log("instancedMeshOfAllLevel:", instancedMeshOfAllLevel);
     for (let i = 0; i < numOfLevel; i++) {
       const obj = instancedMeshOfAllLevel[i]; // obj: { meshes:[], count, matrix4:[] }

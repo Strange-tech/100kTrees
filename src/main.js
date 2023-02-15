@@ -15,7 +15,6 @@ import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader.js";
 function main() {
   // global variables
   const canvas = document.querySelector("#c");
-
   const renderer = new THREE.WebGLRenderer({ canvas: canvas });
   // renderer.outputEncoding = THREE.sRGBEncoding;
 
@@ -24,21 +23,18 @@ function main() {
   const fov = 45;
   const aspect = 2;
   const near = 1;
-  const far = 50000;
+  const far = 30000;
   const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
   camera.position.set(-450, 300, -450);
   camera.lookAt(0, 0, 0);
-
   {
     const color = 0xffffff;
-    const intensity = 1.5;
+    const intensity = 2;
     const light = new THREE.AmbientLight(color, intensity);
     scene.add(light);
   }
-
   const controls = new OrbitControls(camera, canvas);
   controls.target.set(0, 5, 0);
-
   const guiController = new GUIController(camera, controls);
 
   /////////////////////////////////////////////////////////////////////////////////
@@ -67,71 +63,58 @@ function main() {
     vertexNumber,
     vertexNumber
   );
-
   const vertices = terrain.setImprovedNoise(1);
-
   terrain.loadTexture("resources/images/terrain/terrain.png");
-
   terrain.addToScene();
 
   /////////////////////////////////////////////////////////////////////////////////
   // TREES
   const lods = []; // array of lod
-
   const forestArray = [
     {
       url: "resources/models/trees/tree1",
       species: "Macrophanerophytes",
       num: 10000,
-      detail: [],
     },
     {
       url: "resources/models/trees/tree2",
       species: "Broadleaf",
       num: 12000,
-      detail: [],
     },
     {
       url: "resources/models/trees/tree3",
       species: "Bamboo",
       num: 20000,
-      detail: [],
     },
     {
       url: "resources/models/trees/tree4",
       species: "bullshit",
       num: 8000,
-      detail: [],
     },
     {
       url: "resources/models/trees/tree5",
       species: "fuck",
       num: 10000,
-      detail: [],
     },
     {
       url: "resources/models/trees/tree6",
       species: "idiot",
       num: 10000,
-      detail: [],
     },
     // {
     //   url: "resources/models/trees/tree7",
     //   species: "nerd",
     //   num: 1,
-    //   detail: [],
     // },
     {
       url: "resources/models/trees/tree8",
       species: "coward",
       num: 10000,
-      detail: [],
     },
     {
       url: "resources/models/trees/tree9",
       species: "fool",
       num: 10000,
-      detail: [],
     },
   ];
   const forest = new Forest(forestArray);
@@ -229,7 +212,6 @@ function main() {
       let high, middle, low;
       let res,
         detail = [];
-
       if (index < 3) {
         high = promiseController1(
           `${url}/highDraco.glb`,
@@ -366,7 +348,6 @@ function main() {
 
   /////////////////////////////////////////////////////////////////////////////////
   // WATCH
-
   const watchPos = {};
   forest.content.forEach((tree) => {
     let sp = tree.species;
@@ -453,8 +434,9 @@ function main() {
   // RENDER
   function resizeRendererToDisplaySize(renderer) {
     const canvas = renderer.domElement;
-    const width = canvas.clientWidth;
-    const height = canvas.clientHeight;
+    const pixelRatio = window.devicePixelRatio;
+    const width = (canvas.clientWidth * pixelRatio) | 0;
+    const height = (canvas.clientHeight * pixelRatio) | 0;
     const needResize = canvas.width !== width || canvas.height !== height;
     if (needResize) {
       renderer.setSize(width, height, false);
