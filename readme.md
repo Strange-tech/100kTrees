@@ -12,3 +12,4 @@
 2. LOD: My version refering to THREE.LOD
 3. Instantiation: THREE.InstancedMesh
 4. Frustum culling
+5. Space management: Quadtree
