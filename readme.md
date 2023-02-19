@@ -1,8 +1,14 @@
-# 同济大学 smart3d 实验室 毕设项目
+# 100k Trees
 
-## 我是怎么在网页上渲染十万级别的树木模型的？
+## Key Words
 
-1. 模型简化 Draco gltfpipeline
-2. 层次化细节 LOD
-3. 实例化 InstancedMesh
-4. 视锥剔除 Frustum culling
+- ThreeJs, webGL
+- Large-scale, lightweight, web app
+- Computer Graphics
+
+## How I Made It
+
+1. Model simplification: Draco gltfpipeline
+2. LOD: My version refering to THREE.LOD
+3. Instantiation: THREE.InstancedMesh
+4. Frustum culling

@@ -154,9 +154,9 @@ class LevelofDetail {
         instancedMeshOfAllLevel[cur_level].count++;
         instancedMeshOfAllLevel[cur_level].matrix4.push(t);
       } else {
-        cur_level = this.getLastLevel();
-        instancedMeshOfAllLevel[cur_level].count++;
-        instancedMeshOfAllLevel[cur_level].matrix4.push(t);
+        // cur_level = this.getLastLevel();
+        // instancedMeshOfAllLevel[cur_level].count++;
+        // instancedMeshOfAllLevel[cur_level].matrix4.push(t);
       }
     });
     // console.log("instancedMeshOfAllLevel:", instancedMeshOfAllLevel);
