@@ -119,6 +119,12 @@ class LevelofDetail {
     return this.treeSpecies;
   }
 
+  expandFrustum(frustum) {
+    frustum.planes.forEach((plane) => {
+      plane.constant += 50;
+    });
+  }
+
   update(camera) {
     const {
       instancedMeshOfAllLevel,
@@ -139,6 +145,7 @@ class LevelofDetail {
         camera.matrixWorldInverse
       )
     );
+    this.expandFrustum(frustum);
     let obj_position, cur_dist, cur_level;
     const cam_position = camera.position;
     transformation?.forEach((t) => {
@@ -149,14 +156,10 @@ class LevelofDetail {
       );
       cur_dist = obj_position.distanceTo(cam_position);
       // only care about meshes in frustum, aka frustum culling
-      if (cur_dist <= 800 || frustum.containsPoint(obj_position)) {
+      if (frustum.containsPoint(obj_position)) {
         cur_level = this.getDistanceLevel(cur_dist);
         instancedMeshOfAllLevel[cur_level].count++;
         instancedMeshOfAllLevel[cur_level].matrix4.push(t);
-      } else {
-        // cur_level = this.getLastLevel();
-        // instancedMeshOfAllLevel[cur_level].count++;
-        // instancedMeshOfAllLevel[cur_level].matrix4.push(t);
       }
     });
     // console.log("instancedMeshOfAllLevel:", instancedMeshOfAllLevel);
