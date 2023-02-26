@@ -16,6 +16,26 @@
 4. Frustum culling
 5. Space management: Quadtree
 
+## Introduction
+
+The simplest scenarios often contain rich optimization algorithms 😎<br>
+
+As the title says, this web scene can hold 100,000 trees and runs smoothly in Chrome at 60fps. <br>
+
+The tree models are modeled by Unity and converted to glb-draco format as front-end resource files. <br>
+
+Perhaps a scene containing one single tree is easy to implement, just call GLTFLoader! But as the size of the data increases, many methods need to be accommodated to meet the "acceptable" effect. Otherwise, the frame rate will be very low, and the webpage may even crash 😢<br>
+
+The most extensive and direct method is to use THREE.InstancedMesh, which can effectively reduce the number of drawcalls and give full play to the performance of the GPU 💪<br>
+
+A more effective approach would be to add LODs to each tree model, with distant trees replaced with simplified models. In order not to affect the look and feel, you can set multi-level details, generally three layers of far, middle and near, so you need to ask the artist for three models of different precision. <br>
+
+Another more powerful method is frustum culling, which can cull all trees that cannot be seen from the current perspective, reduce the burden on the CPU and GPU, and further increase the frame rate. But please note that this is different from the camera provided by Threejs. Although the camera has built-in similar functions, what we need to do is to eliminate it in the instantiation phase. For more details, please refer to the code in LevelofDetail.js. In addition, there is still a problem with the above-mentioned frustum culling: if the user rotates the viewing angle quickly, he will see a short blank at the edge because it is too late to refresh. This problem can be solved with a very subtle method, and the code does not exceed 5 lines 😝<br >
+
+Quadtree is an excellent data structure for space management, and here they are used to generate tree placement: trees are randomized and they cannot be placed too close to each other. In a popular metaphor, each tree is like an atom, which cannot get too close to each other due to repulsion. <br>
+
+In summary, that is all the optimization methods used in this project. You may wonder that THREE.LOD cannot be perfectly combined with THREE.InstancedMesh. In the source code provided by the Threejs official website, these two seem to have different logics 🤔. It is true, so I tried to combine the two in my own way, although some code logic looks a bit stupid (maybe you can easily find it), but the final effect is not bad 🤣
+
 ## 简介
 
 最简单的场景往往蕴含丰富的优化算法 😎<br>
@@ -36,7 +56,7 @@
 
 综上，就是此项目用到的全部优化方法。也许你会疑问，THREE.LOD 不能与 THREE.InstancedMesh 完美地结合起来，在 Threejs 官网提供的源码中，二者似乎是不同的逻辑 🤔。确实如此，所以我用自己的方式尝试把二者结合起来了，虽然有些代码逻辑看起来有点蠢（也许你能很轻易地发现），但最终效果还不错 🤣
 
-附上 Netlify 链接 [https://strange-forest.netlify.app](https://strange-forest.netlify.app)
+Netlify link [https://strange-forest.netlify.app](https://strange-forest.netlify.app)
 
 ## 走马观花
 
