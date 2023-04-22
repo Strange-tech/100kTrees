@@ -220,8 +220,8 @@ function main() {
           "middle",
           2000
         );
-        res = await Promise.all([high, middle, low]);
         low = promiseController1(`${url}/low.glb`, species, "low", 4000);
+        res = await Promise.all([high, middle, low]);
       } else {
         high = promiseController1(
           `${url}/highDraco.glb`,
@@ -241,7 +241,7 @@ function main() {
         });
       });
       // console.log(detail);
-      const lod = new LevelofDetail(scene, species);
+      const lod = new LevelofDetail(scene, camera, species);
       lod.setLevels(detail);
       lod.setPopulation(num);
       for (let i = 0; i < num; i++) {
@@ -449,7 +449,7 @@ function main() {
       camera.updateProjectionMatrix();
     }
     lods.forEach((lod) => {
-      lod.update(camera);
+      lod.render();
     });
     renderer.render(scene, camera);
   }
@@ -465,10 +465,10 @@ function main() {
     requestAnimationFrame(animate);
     render();
   }
-  animate();
+  // animate();
 
-  // controls.addEventListener("change", requestRenderIfNotRequested);
-  // window.addEventListener("resize", requestRenderIfNotRequested);
+  controls.addEventListener("change", requestRenderIfNotRequested);
+  window.addEventListener("resize", requestRenderIfNotRequested);
 }
 
 main();

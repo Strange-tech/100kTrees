@@ -8,10 +8,11 @@ import * as THREE from "three";
  *
  *************************************************************************************/
 class LevelofDetail {
-  constructor(scene, treeSpecies) {
+  constructor(scene, camera, treeSpecies) {
     this.treeSpecies = treeSpecies;
     this.numOfLevel = 0;
     this.scene = scene;
+    this.camera = camera;
     this.levels;
     this.instancedMeshOfAllLevel;
     this.groupOfInstances;
@@ -25,7 +26,6 @@ class LevelofDetail {
   }
 
   setLevels(array) {
-    const { scene } = this;
     this.numOfLevel = array.length;
     this.levels = new Array(this.numOfLevel);
     for (let i = 0; i < this.numOfLevel; i++) {
@@ -55,7 +55,7 @@ class LevelofDetail {
         group.add(instancedMesh);
       });
       this.groupOfInstances[i] = group;
-      scene.add(group);
+      this.scene.add(group);
     }
   }
 
@@ -125,12 +125,13 @@ class LevelofDetail {
     });
   }
 
-  update(camera) {
+  render() {
     const {
       instancedMeshOfAllLevel,
       groupOfInstances,
       transformation,
       numOfLevel,
+      camera,
     } = this;
     // clear
     for (let i = 0; i < numOfLevel; i++) {
@@ -165,23 +166,17 @@ class LevelofDetail {
     // console.log("instancedMeshOfAllLevel:", instancedMeshOfAllLevel);
     for (let i = 0; i < numOfLevel; i++) {
       const obj = instancedMeshOfAllLevel[i]; // obj: { meshes:[], count, matrix4:[] }
-      groupOfInstances[i].children.forEach((child) => {
-        child.count = obj.count;
-        for (let j = 0; j < obj.count; j++)
-          child.setMatrixAt(j, obj.matrix4[j]);
-      });
-      /* old code: 每次都创建新的实例，理论上要频繁地垃圾回收 */
-      // for (let j = 0; j < groupOfInstances[i].children.length; j++) {
-      //   const instancedMesh = new THREE.InstancedMesh(
-      //     obj.meshes[j].geometry,
-      //     obj.meshes[j].material,
-      //     obj.count
-      //   );
-      //   for (let k = 0; k < obj.count; k++) {
-      //     instancedMesh.setMatrixAt(k, obj.matrix4[k]);
-      //   }
-      //   groupOfInstances[i].children[j] = instancedMesh;
-      // }
+      for (let j = 0; j < groupOfInstances[i].children.length; j++) {
+        const instancedMesh = new THREE.InstancedMesh(
+          obj.meshes[j].geometry,
+          obj.meshes[j].material,
+          obj.count
+        );
+        for (let k = 0; k < obj.count; k++) {
+          instancedMesh.setMatrixAt(k, obj.matrix4[k]);
+        }
+        groupOfInstances[i].children[j] = instancedMesh;
+      }
     }
     // console.log("groupOfInstances:", groupOfInstances);
   }
