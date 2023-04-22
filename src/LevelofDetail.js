@@ -40,23 +40,23 @@ class LevelofDetail {
       };
     }
     this.groupOfInstances = new Array(this.numOfLevel); // array of THREE.Group(), each Group -> tree meshes in each level
+  }
+
+  setPopulation(number) {
+    this.transformation = new Array(number);
     for (let i = 0; i < this.numOfLevel; i++) {
       const group = new THREE.Group();
       this.instancedMeshOfAllLevel[i].meshes.forEach((m) => {
         const instancedMesh = new THREE.InstancedMesh(
           m.geometry,
           m.material,
-          0 // 暂时先使用0，只是为了占位
+          number
         );
         group.add(instancedMesh);
       });
       this.groupOfInstances[i] = group;
       scene.add(group);
     }
-  }
-
-  setPopulation(number) {
-    this.transformation = new Array(number);
   }
 
   setTransform(index, matrix4) {
@@ -165,17 +165,23 @@ class LevelofDetail {
     // console.log("instancedMeshOfAllLevel:", instancedMeshOfAllLevel);
     for (let i = 0; i < numOfLevel; i++) {
       const obj = instancedMeshOfAllLevel[i]; // obj: { meshes:[], count, matrix4:[] }
-      for (let j = 0; j < groupOfInstances[i].children.length; j++) {
-        const instancedMesh = new THREE.InstancedMesh(
-          obj.meshes[j].geometry,
-          obj.meshes[j].material,
-          obj.count
-        );
-        for (let k = 0; k < obj.count; k++) {
-          instancedMesh.setMatrixAt(k, obj.matrix4[k]);
-        }
-        groupOfInstances[i].children[j] = instancedMesh;
-      }
+      groupOfInstances[i].children.forEach((child) => {
+        child.count = obj.count;
+        for (let j = 0; j < obj.count; j++)
+          child.setMatrixAt(j, obj.matrix4[j]);
+      });
+      /* old code: 每次都创建新的实例，理论上要频繁地垃圾回收 */
+      // for (let j = 0; j < groupOfInstances[i].children.length; j++) {
+      //   const instancedMesh = new THREE.InstancedMesh(
+      //     obj.meshes[j].geometry,
+      //     obj.meshes[j].material,
+      //     obj.count
+      //   );
+      //   for (let k = 0; k < obj.count; k++) {
+      //     instancedMesh.setMatrixAt(k, obj.matrix4[k]);
+      //   }
+      //   groupOfInstances[i].children[j] = instancedMesh;
+      // }
     }
     // console.log("groupOfInstances:", groupOfInstances);
   }

@@ -1,7 +1,7 @@
 /*************************************************************************************
  * CLASS NAME:  QuadTree
  * DESCRIPTION: Scene manager, assuring trees not to be too closed to each other
- * NOTE:        
+ * NOTE:
  *
  *************************************************************************************/
 class QuadTree {
@@ -11,6 +11,7 @@ class QuadTree {
     this.points = [];
     this.divided = false;
   }
+
   subdivide() {
     let x = this.boundary.x;
     let y = this.boundary.y;

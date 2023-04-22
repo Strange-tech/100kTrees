@@ -213,26 +213,21 @@ function main() {
       let res,
         detail = [];
       if (index < 3) {
-        high = promiseController1(
-          `${url}/highDraco.glb`,
-          species,
-          "high",
-          1200
-        );
-        low = promiseController1(`${url}/low.glb`, species, "low", 4000);
+        high = promiseController1(`${url}/highDraco.glb`, species, "high", 800);
         middle = promiseController1(
           `${url}/middle.glb`,
           species,
           "middle",
-          3000
+          2000
         );
         res = await Promise.all([high, middle, low]);
+        low = promiseController1(`${url}/low.glb`, species, "low", 4000);
       } else {
         high = promiseController1(
           `${url}/highDraco.glb`,
           species,
           "high",
-          2000
+          1000
         );
         low = promiseController1(`${url}/low.glb`, species, "low", 3000);
         res = await Promise.all([high, low]);
@@ -466,8 +461,14 @@ function main() {
     }
   }
 
-  controls.addEventListener("change", requestRenderIfNotRequested);
-  window.addEventListener("resize", requestRenderIfNotRequested);
+  function animate() {
+    requestAnimationFrame(animate);
+    render();
+  }
+  animate();
+
+  // controls.addEventListener("change", requestRenderIfNotRequested);
+  // window.addEventListener("resize", requestRenderIfNotRequested);
 }
 
 main();
